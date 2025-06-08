@@ -1,6 +1,7 @@
+
+
 import 'package:flutter/cupertino.dart';
 
-import '../../../data/data_sources/freeshow_websocket_service.dart';
 import '../../../data/data_sources/http_calls.dart';
 
 class HomePage extends StatefulWidget {
@@ -61,6 +62,11 @@ class _HomePageState extends State<HomePage> {
   }*/
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(
@@ -68,7 +74,8 @@ class _HomePageState extends State<HomePage> {
         // trailing: Icon(CupertinoIcons.person_crop_circle),
       ),
       child: SafeArea(
-        child: ListView(
+        child:
+        ListView(
           padding: const EdgeInsets.all(10),
           children: [
             Text('Move to next slide'),
@@ -77,8 +84,8 @@ class _HomePageState extends State<HomePage> {
                 await getSongs();
               },
               child: const Text('Next slide'),
-            ),
-            /*Text(
+            )
+             /*Text(
               'Connection Status: ${_isConnected ? "Connected" : "Disconnected"}',
             ),
             const SizedBox(height: 10),

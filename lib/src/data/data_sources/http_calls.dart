@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
-final String baseUrl =
+final String baseUrl = //'http://127.0.0.1:5505';
     'http://192.168.3.246:5505'; // Replace with your FreeShow API URL
 
 Future<void> nextSlide() async {
@@ -48,12 +48,14 @@ Future<void> loadSong(String songId) async {
 
 Future<void> getSongs() async {
   // final String baseUrl = 'http://localhost:8080'; // Replace with your FreeShow API URL
-  final response = await http.get(Uri.parse('$baseUrl/show_name'));
+  String action = 'show_name';
+  final response = await http.get(Uri.parse('$baseUrl'));
+  debugPrint('statusCode ${response.statusCode}');
 
   if (response.statusCode == 200) {
     // If the server returns a 200 OK response, parse the JSON.
-    List<dynamic> songs = jsonDecode(response.body);
-    debugPrint('songs ARE $songs');
+    // List<dynamic> songs = jsonDecode(response.body);
+    debugPrint('songs ARE ${response.body}');
   } else {
     debugPrint('Status code: ${response.statusCode}');
     throw Exception('Failed to load songs');

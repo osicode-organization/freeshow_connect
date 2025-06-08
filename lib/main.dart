@@ -2,11 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:freeshow_connect/src/presentation/pages/home/home_page.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
-void main() {
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   String val = '';
   debugPrint('before ssocket');
   // Dart client
-  IO.Socket socket = IO.io('http://192.168.3.246:5505');
+  IO.Socket socket = IO.io('http://192.168.3.246:5506');
   socket.onConnect((_) {
     debugPrint('connect');
     // socket.emit('msg', 'test');

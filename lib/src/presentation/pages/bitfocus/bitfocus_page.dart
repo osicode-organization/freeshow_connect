@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+// import 'package:webview_flutter/webview_flutter.dart';
 
 class BitfocusPage extends StatefulWidget {
   const BitfocusPage({super.key});
@@ -9,7 +9,7 @@ class BitfocusPage extends StatefulWidget {
 }
 
 class _BitfocusPageState extends State<BitfocusPage> {
-  late final WebViewController _controller;
+  // late final WebViewController _controller;
 
   @override
   void initState() {
@@ -26,8 +26,9 @@ class _BitfocusPageState extends State<BitfocusPage> {
         middle: Text('Bitfocus Companion'),
       ),
       child: SafeArea(
-        child: WebView(initialUrl: 'http://192.168.3.246:8000/tablet',),
-      ), //WebViewWidget(controller: _controller)),
+        child: Container()//WebView(initialUrl: 'http://192.168.3.246:8000/tablet',),),
+            // WebViewWidget(controller: _controller),
+      ),
     );
   }
 }
