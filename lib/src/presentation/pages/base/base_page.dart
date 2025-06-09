@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:freeshow_connect/src/presentation/pages/bitfocus/bitfocus_page.dart';
 import 'package:freeshow_connect/src/presentation/pages/home/home_page.dart';
+import 'package:freeshow_connect/src/presentation/pages/settings/settings_page.dart';
 
 class BasePage extends StatefulWidget {
   const BasePage({super.key});
@@ -38,23 +39,11 @@ class _BasePageState extends State<BasePage> {
           case 1:
             return const BitfocusPage();
           case 2:
-            return const SettingsTab();
+            return const SettingsPage();
           default:
             return const HomePage();
         }
       },
-    );
-  }
-}
-
-class SettingsTab extends StatelessWidget {
-  const SettingsTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(middle: Text('Settings')),
-      child: Center(child: Text('Settings Content')),
     );
   }
 }

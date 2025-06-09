@@ -1,8 +1,10 @@
 import 'dart:convert';
+// import 'package:socket_io_client/socket_io_client.dart';
+
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-import 'package:socket_io_client/socket_io_client.dart';
 
 final String baseUrl = 'http://192.168.3.246:5505'; //'http://10.0.2.2:5505';
 // 'http://192.168.3.246:3000'; // Replace with your FreeShow API URL
@@ -101,31 +103,18 @@ Future<void> getSongs() async {
   }
 }
 
-Future<void> socketConnect() async {
-  debugPrint('before ssocket');
-
-  // Dart client
-  // Socket socket = io('https://flutter.dev'); //http://192.168.3.246:5505
-  Socket socket = io(
-    'http://10.0.2.2:5505',
-    OptionBuilder()
-        .setTransports(['websocket']) // for Flutter or Dart VM
-        .disableAutoConnect() // disable auto-connection
-        .setExtraHeaders({'foo': 'bar'}) // optional
-        .build(),
-  );
-  socket.connect();
-
-  socket.onConnect((_) {
-    debugPrint('connect');
-    socket.emit('msg', 'test');
-  });
-  socket.on('event', (data) => debugPrint('data is: $data'));
-  socket.onDisconnect((_) => debugPrint('disconnect'));
-  socket.on("error", (err) => debugPrint('Error message from server: $err'));
-  socket.on('fromServer', (_) => debugPrint('_'));
-
-  debugPrint('after ssocket');
-
-  debugPrint('state  is: ${socket.connected}');
+Future<bool> isPortOpen(
+  String host,
+  int port, {
+  Duration timeout = const Duration(seconds: 1),
+}) async {
+  try {
+    final socket = await Socket.connect(host, port, timeout: timeout);
+    socket.destroy();
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
+
+// Usage

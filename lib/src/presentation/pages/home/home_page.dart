@@ -1,7 +1,9 @@
-
-
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_gutter/flutter_gutter.dart';
+import 'package:freeshow_connect/src/domain/entity/port_status_entity.dart';
+import 'package:intl/intl.dart';
 
+import '../../../data/data_sources/check_port_status.dart';
 import '../../../data/data_sources/http_calls.dart';
 
 class HomePage extends StatefulWidget {
@@ -12,55 +14,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  /*
-  FreeShowWebSocketService? _webSocketService;
-  String _lastReceivedMessage = 'No messages yet.';
-  bool _isConnected = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _webSocketService = FreeShowWebSocketService(
-      onMessageReceived: (message) {
-        setState(() {
-          _lastReceivedMessage = 'Received: $message';
-        });
-        // You would parse the message here based on FreeShow's WebSocket events
-        // e.g., if it sends {"type": "slide_changed", "currentSlide": 5}
-      },
-      onError: (error) {
-        setState(() {
-          _lastReceivedMessage = 'Error: $error';
-          _isConnected = false;
-        });
-      },
-      onDisconnected: () {
-        setState(() {
-          _isConnected = false;
-          _lastReceivedMessage = 'Disconnected.';
-        });
-      },
-    );
-    _webSocketService!.connect(); // Connect when the screen initializes
-  }
-
-  @override
-  void dispose() {
-    _webSocketService?.disconnect(); // Disconnect when the screen is disposed
-    super.dispose();
-  }
-
-  void _sendNextProjectItem() {
-    _webSocketService?.sendMessage('next_project_item');
-  }
-
-  void _selectProjectByIndex(int index) {
-    _webSocketService?.sendMessage(
-      'index_select_project',
-      data: {'index': index},
-    );
-  }*/
-
+  bool connectionStatus = false;
   @override
   void initState() {
     super.initState();
@@ -69,29 +23,75 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Freeshow connect app'),
-        // trailing: Icon(CupertinoIcons.person_crop_circle),
+      navigationBar: CupertinoNavigationBar(
+        middle: const Text('Freeshow connect app'),
+        trailing:
+            connectionStatus
+                ? Icon(
+                  CupertinoIcons.check_mark_circled_solid,
+                  color: CupertinoColors.systemGreen,
+                )
+                : Icon(
+                  CupertinoIcons.xmark_circle_fill,
+                  color: CupertinoColors.systemRed,
+                ),
       ),
       child: SafeArea(
-        child:
-        ListView(
+        child: ListView(
           padding: const EdgeInsets.all(10),
           children: [
             CupertinoButton(
               onPressed: () async {
-                await nextSlide();
+                // await nextSlide();
+                final available = await isPortOpen('localhost', 5505);
+                print('Port 3000 is ${available ? 'open' : 'closed'}');
               },
+              color: CupertinoColors.systemBrown,
               child: const Text('Connect socket'),
             ),
+            Gutter(),
             Text('Move to next slide'),
             CupertinoButton(
               onPressed: () async {
                 await nextSlide_2();
               },
+              color: CupertinoColors.systemMint,
               child: const Text('Next slide'),
-            )
-             /*Text(
+            ),
+            Gutter(),
+            StreamBuilder<PortStatusEntity>(
+              stream: checkPortStatus('localhost', 5505),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return CupertinoActivityIndicator();
+                }
+
+                final status = snapshot.data!;
+                // setState(() {});
+                status.isOpen
+                    ? connectionStatus = true
+                    : connectionStatus = false;
+                return Column(
+                  children: [
+                    CupertinoButton(
+                      onPressed: () {},
+                      color:
+                          status.isOpen
+                              ? CupertinoColors.activeGreen
+                              : CupertinoColors.systemRed,
+                      child: Text(status.isOpen ? 'Connected' : 'Disconnected'),
+                    ),
+                    if (status.responseTime != null)
+                      Text('Response: ${status.responseTime}ms'),
+                    if (status.error != null) Text('Error: ${status.error}'),
+                    Text(
+                      'Last checked: ${DateFormat('HH:mm:ss').format(status.lastChecked)}',
+                    ),
+                  ],
+                );
+              },
+            ),
+            /*Text(
               'Connection Status: ${_isConnected ? "Connected" : "Disconnected"}',
             ),
             const SizedBox(height: 10),

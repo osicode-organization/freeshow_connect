@@ -17,7 +17,8 @@ class FreeshowConnectApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: CupertinoThemeData(
         brightness: Brightness.light,
-        primaryColor: CupertinoColors.systemRed,
+        primaryColor: CupertinoColors.black,
+        scaffoldBackgroundColor: CupertinoColors.lightBackgroundGray,
       ),
       home: const BasePage(),
     );
