@@ -1,4 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_gutter/flutter_gutter.dart';
+import 'package:freeshow_connect/src/data/data_sources/http_calls.dart'
+    show nextSlide_2;
+
+import '../../../data/data_sources/get_calls.dart';
 // import 'package:webview_flutter/webview_flutter.dart';
 
 class BitfocusPage extends StatefulWidget {
@@ -9,14 +14,9 @@ class BitfocusPage extends StatefulWidget {
 }
 
 class _BitfocusPageState extends State<BitfocusPage> {
-  // late final WebViewController _controller;
-
   @override
   void initState() {
     super.initState();
-    // _controller.loadUrl('http://192.168.3.246:8000/tablet');
-    // ..loadRequest(Uri.parse('http://192.168.3.246:8000/tablet'));
-    // WebViewController()..loadRequest(Uri.parse('https://flutter.dev'));
   }
 
   @override
@@ -26,8 +26,37 @@ class _BitfocusPageState extends State<BitfocusPage> {
         middle: Text('Bitfocus Companion'),
       ),
       child: SafeArea(
-        child: Container()//WebView(initialUrl: 'http://192.168.3.246:8000/tablet',),),
-            // WebViewWidget(controller: _controller),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text('Move to next slide'),
+            CupertinoButton(
+              onPressed: () async {
+                await nextSlide_2();
+              },
+              color: CupertinoColors.systemMint,
+              child: const Text('Next slide'),
+            ),
+            GutterExtraLarge(),
+            Text('Get shows'),
+            CupertinoButton(
+              onPressed: () async {
+                await getShow();
+              },
+              color: CupertinoColors.systemIndigo,
+              child: const Text('Get shows'),
+            ),
+            GutterExtraLarge(),
+            Text('Get projects'),
+            CupertinoButton(
+              onPressed: () async {
+                await getProjects();
+              },
+              color: CupertinoColors.systemRed,
+              child: const Text('Get projects'),
+            ),
+          ],
+        ),
       ),
     );
   }
