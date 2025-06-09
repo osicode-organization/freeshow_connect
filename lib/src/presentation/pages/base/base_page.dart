@@ -2,14 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:freeshow_connect/src/presentation/pages/bitfocus/bitfocus_page.dart';
 import 'package:freeshow_connect/src/presentation/pages/home/home_page.dart';
 
-class Base extends StatefulWidget {
-  const Base({super.key});
+class BasePage extends StatefulWidget {
+  const BasePage({super.key});
 
   @override
-  State<Base> createState() => _BaseState();
+  State<BasePage> createState() => _BasePageState();
 }
 
-class _BaseState extends State<Base> {
+class _BasePageState extends State<BasePage> {
   @override
   Widget build(BuildContext context) {
     return CupertinoTabScaffold(

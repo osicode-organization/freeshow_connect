@@ -78,10 +78,16 @@ class _HomePageState extends State<HomePage> {
         ListView(
           padding: const EdgeInsets.all(10),
           children: [
+            CupertinoButton(
+              onPressed: () async {
+                await nextSlide();
+              },
+              child: const Text('Connect socket'),
+            ),
             Text('Move to next slide'),
             CupertinoButton(
               onPressed: () async {
-                await getSongs();
+                await nextSlide_2();
               },
               child: const Text('Next slide'),
             )
