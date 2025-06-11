@@ -3,7 +3,7 @@ import 'package:flutter_gutter/flutter_gutter.dart';
 
 import '../../../data/data_sources/get_calls.dart';
 import '../../../data/data_sources/post_calls.dart';
-import '../../../data/models/projects_models/projects_model.dart';
+import '../../../data/models/all_projects_models/all_projects_model.dart';
 
 class BiblePage extends StatefulWidget {
   const BiblePage({super.key});
@@ -14,7 +14,7 @@ class BiblePage extends StatefulWidget {
 
 class _BiblePageState extends State<BiblePage>
     with SingleTickerProviderStateMixin {
-  late List<ProjectsModel> projectsList = [];
+  late List<AllProjectsModel> projectsList = [];
   late PageController _pageController;
 
   @override
@@ -107,11 +107,11 @@ class _BiblePageState extends State<BiblePage>
                               itemBuilder: (context, index) {
                                 return CupertinoButton.filled(
                                   child: Text(
-                                    thisProject.projectShows[index].showName,
+                                    thisProject.projectShows[index].name,
                                   ),
                                   onPressed: () async {
                                     await selectShowByName(
-                                      thisProject.projectShows[index].showName,
+                                      thisProject.projectShows[index].name,
                                     );
                                     await startShow(
                                       thisProject.projectShows[index].showId,

@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:freeshow_connect/dependency_injection/dependency_injection.dart';
 import 'package:freeshow_connect/src/data/data_sources/get_initial_ip_address.dart';
 import 'package:freeshow_connect/src/presentation/pages/base/base_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,8 +31,7 @@ class FreeshowConnectApp extends ConsumerStatefulWidget {
 class _FreeshowConnectAppState extends ConsumerState<FreeshowConnectApp> {
   @override
   void initState() {
-    print('ip from app init $localIpAddress');
-    // ref.read(ipAddressProvider).setLocalIpAdress = localIpAddress;
+    // print('ip from app init $localIpAddress');
     super.initState();
   }
 

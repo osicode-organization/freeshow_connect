@@ -4,8 +4,7 @@ import 'package:flutter_gutter/flutter_gutter.dart';
 
 import '../../../data/data_sources/get_calls.dart';
 import '../../../data/data_sources/post_calls.dart';
-import '../../../data/models/projects_models/projects_model.dart';
-// import 'package:webview_flutter/webview_flutter.dart';
+import '../../../data/models/all_projects_models/all_projects_model.dart';
 
 class BitfocusPage extends StatefulWidget {
   const BitfocusPage({super.key});
@@ -15,7 +14,7 @@ class BitfocusPage extends StatefulWidget {
 }
 
 class _BitfocusPageState extends State<BitfocusPage> {
-  List<ProjectsModel> projectsList = [];
+  List<AllProjectsModel> projectsList = [];
   @override
   void initState() {
     super.initState();
@@ -23,9 +22,9 @@ class _BitfocusPageState extends State<BitfocusPage> {
 
   @override
   Widget build(BuildContext context) {
-    String? _value;
+    String? value;
     if (projectsList.isEmpty) {
-      _value = 'project';//projectsList[0].name;
+      value = 'project'; //projectsList[0].name;
     }
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(
@@ -39,7 +38,7 @@ class _BitfocusPageState extends State<BitfocusPage> {
             Text('Get shows'),
             CupertinoButton(
               onPressed: () async {
-                await getShow();
+                await getAllShows();
               },
               color: CupertinoColors.systemIndigo,
               child: const Text('Get shows'),
@@ -64,14 +63,15 @@ class _BitfocusPageState extends State<BitfocusPage> {
             if (projectsList.isNotEmpty)
               CupertinoSlidingSegmentedControl(
                 children: {
-                  for (var item in projectsList) item.projectName: Text(item.projectName),
+                  for (var item in projectsList)
+                    item.projectName: Text(item.projectName),
                 },
                 onValueChanged: (String? value) {
                   setState(() {
-                    _value = value;
+                    value = value;
                   });
                 },
-                groupValue: _value,
+                groupValue: value,
               ),
             Wrap(
               children: [
@@ -83,7 +83,9 @@ class _BitfocusPageState extends State<BitfocusPage> {
                       onTap: () async {
                         await selectProjectByName(toElement.projectName);
                       },
-                      child: Card(child: Center(child: Text(toElement.projectName))),
+                      child: Card(
+                        child: Center(child: Text(toElement.projectName)),
+                      ),
                     ),
                   ),
                 ),

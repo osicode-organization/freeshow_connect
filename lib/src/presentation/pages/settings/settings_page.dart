@@ -1,5 +1,4 @@
 import 'package:cupertino_lists_enhanced/list_section.dart';
-import 'package:cupertino_lists_enhanced/list_tile.dart';
 import 'package:cupertino_lists_enhanced/selection_item.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -13,7 +12,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  String? _routeValue = "Wi-Fi";
   String appearanceValue = "Automatic";
   @override
   Widget build(BuildContext context) {

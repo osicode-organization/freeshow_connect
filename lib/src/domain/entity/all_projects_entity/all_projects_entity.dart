@@ -1,17 +1,15 @@
 import 'package:equatable/equatable.dart';
-import 'package:freeshow_connect/src/domain/entity/projects_entity/project_shows_entity.dart';
+import 'package:freeshow_connect/src/domain/entity/show_entity/show_details_entity.dart';
 
-import '../shows_entity/shows_entity.dart';
-
-class ProjectsEntity extends Equatable {
+class AllProjectsEntity extends Equatable {
   final String projectId;
   final String projectName;
   final DateTime projectCreated;
   final String projectParent;
-  final List<ShowsEntity> projectShows;
+  final List<ShowDetailsEntity> projectShows;
   final DateTime? projectModified; // Optional field
   final DateTime? projectUsed;
-  const ProjectsEntity({
+  const AllProjectsEntity({
     required this.projectId,
     required this.projectName,
     required this.projectCreated,

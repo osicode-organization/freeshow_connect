@@ -1,12 +1,11 @@
 import 'dart:convert';
-// import 'package:socket_io_client/socket_io_client.dart';
-
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
-final String baseUrl = 'http://localhost:5505'; //'http://10.0.2.2:5505';172.31.99.26
+final String baseUrl =
+    'http://localhost:5505'; //'http://10.0.2.2:5505';172.31.99.26
 // 'http://192.168.3.246:3000'; // Replace with your FreeShow API URL
 // 'http://127.0.0.1:5505'
 
@@ -21,25 +20,9 @@ Future<void> loadSong(String songId) async {
   );
 
   if (response.statusCode == 200) {
-    print('Loaded song with ID: $songId');
+    debugPrint('Loaded song with ID: $songId');
   } else {
     throw Exception('Failed to load song');
-  }
-}
-
-Future<void> getSongs() async {
-  // final String baseUrl = 'http://localhost:8080'; // Replace with your FreeShow API URL
-  String action = 'show_name';
-  final response = await http.get(Uri.parse('$baseUrl'));
-  debugPrint('statusCode ${response.statusCode}');
-
-  if (response.statusCode == 200) {
-    // If the server returns a 200 OK response, parse the JSON.
-    // List<dynamic> songs = jsonDecode(response.body);
-    debugPrint('songs ARE ${response.body}');
-  } else {
-    debugPrint('Status code: ${response.statusCode}');
-    throw Exception('Failed to load songs');
   }
 }
 

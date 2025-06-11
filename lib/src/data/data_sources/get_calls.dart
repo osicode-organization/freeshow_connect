@@ -1,15 +1,20 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:freeshow_connect/src/data/models/show_models/show_data_model.dart';
+import 'package:freeshow_connect/src/domain/entity/all_shows_entity/all_shows_item_entity.dart';
+import 'package:freeshow_connect/src/domain/entity/show_entity/show_data_entity.dart';
+import 'package:freeshow_connect/src/domain/entity/show_entity/show_details_entity.dart';
 import 'package:http/http.dart' as http;
 
-import '../models/projects_models/project_data_model.dart';
-import '../models/projects_models/projects_model.dart';
-import '../models/shows_models/show_data_model.dart';
-import '../models/shows_models/shows_model.dart';
+import '../models/all_projects_models/all_projects_data_model.dart';
+import '../models/all_projects_models/all_projects_model.dart';
+import '../models/all_shows_models/all_shows_data_model.dart';
 import 'http_calls.dart';
 
-Future<List<ShowsModel>> getShow() async {
+/// [get_shows]
+/// Gets all shows from Freeshow.
+Future<List<ShowDetailsEntity>> getAllShows() async {
   final Map<String, dynamic> data = {};
 
   final String actionId = 'get_shows';
@@ -21,8 +26,7 @@ Future<List<ShowsModel>> getShow() async {
   if (response.statusCode == 200) {
     debugPrint('Successful get_shows command. Response is ${response.body}');
     final Map<String, dynamic> jsonMap = json.decode(response.body);
-    return showModelList(jsonMap);
-    debugPrint('Successful get_shows list is ${showModelList(jsonMap)}');
+    return await allShowsModelList(jsonMap);
   } else if (response.statusCode == 204) {
     // Handle success with no content
     debugPrint('Get was successful, no content returned.');
@@ -35,29 +39,27 @@ Future<List<ShowsModel>> getShow() async {
   return [];
 }
 
-List<ShowsModel> showModelList(Map<String, dynamic> jsonMap) {
-  final ShowDataModel showData = ShowDataModel.fromJson(jsonMap);
-  return showData.data.entries.map((entry) {
-    return ShowsModel(
-      showId: entry.key,
-      showName: entry.value.name,
-      showCategory: entry.value.category,
-      showCreated: DateTime.fromMillisecondsSinceEpoch(
-        entry.value.timestamps.created,
-      ),
-      showModified: DateTime.fromMillisecondsSinceEpoch(
-        entry.value.timestamps.modified,
-      ),
-      showUsed: DateTime.fromMillisecondsSinceEpoch(
-        entry.value.timestamps.used,
-      ),
-      showQuickAccess: entry.value.quickAccess,
-      showOrigin: entry.value.origin,
-    );
-  }).toList();
+Future<List<ShowDetailsEntity>> allShowsModelList(
+  Map<String, dynamic> jsonMap,
+) async {
+  final AllShowsDataModel showData = AllShowsDataModel.fromJson(jsonMap);
+
+  final v =
+      showData.data.entries
+          .map(
+            (MapEntry<String, AllShowsItemEntity> entry) =>
+                getSingleShow(entry.key),
+          )
+          .toList();
+  final allShows = await Future.wait(v);
+  final List<ShowDetailsEntity> allShowsDetails =
+      allShows.map((item) => item.data).toList();
+  return allShowsDetails;
 }
 
-Future<List<ProjectsModel>> getProjects() async {
+/// [get_projects]
+/// Gets all projects from Freeshow.
+Future<List<AllProjectsModel>> getProjects() async {
   final Map<String, dynamic> data = {};
 
   final String actionId = 'get_projects';
@@ -73,8 +75,8 @@ Future<List<ProjectsModel>> getProjects() async {
     // );
     final Map<String, dynamic> jsonMap = json.decode(response.body);
 
-    final List<ShowsModel> allShows = await getShow();
-    return projectModelList(jsonMap, allShows);
+    final List<ShowDetailsEntity> allShows = await getAllShows();
+    return allProjectsModelList(jsonMap, allShows);
   } else if (response.statusCode == 204) {
     // Handle success with no content
     debugPrint('Get was successful, no content returned.');
@@ -87,13 +89,15 @@ Future<List<ProjectsModel>> getProjects() async {
   return [];
 }
 
-List<ProjectsModel> projectModelList(
+List<AllProjectsModel> allProjectsModelList(
   Map<String, dynamic> jsonMap,
-  List<ShowsModel> allShows,
+  List<ShowDetailsEntity> allShows,
 ) {
-  final ProjectDataModel projectData = ProjectDataModel.fromJson(jsonMap);
+  final AllProjectsDataModel projectData = AllProjectsDataModel.fromJson(
+    jsonMap,
+  );
 
-  List<ProjectsModel> projects = [];
+  List<AllProjectsModel> projects = [];
 
   projectData.data.forEach((key, projectEntry) {
     /*debugPrint('  Name: ${projectEntry.name}');
@@ -124,7 +128,7 @@ List<ProjectsModel> projectModelList(
     // Extract IDs from ProjectShowsModel list
     List<String> projectShowIds =
         projectEntry.shows.map((project) => project.id).toList();
-    List<ShowsModel> filteredShows =
+    List<ShowDetailsEntity> filteredShows =
         allShows.where((show) => projectShowIds.contains(show.showId)).toList();
 
     // for (var show in filteredShows) {
@@ -132,7 +136,7 @@ List<ProjectsModel> projectModelList(
     // }
 
     projects.add(
-      ProjectsModel(
+      AllProjectsModel(
         projectId: key,
         projectName: projectEntry.name,
         projectCreated: DateTime.fromMillisecondsSinceEpoch(
@@ -152,6 +156,31 @@ List<ProjectsModel> projectModelList(
   return projects;
 }
 
+/// [get_show]
+/// Gets details of a single show from Freeshow.
+Future<ShowDataEntity> getSingleShow(String showId) async {
+  final Map<String, dynamic> data = {"id": showId};
+
+  final String actionId = 'get_show';
+  final String nextUrl = '$baseUrl?action=$actionId&data=${jsonEncode(data)}';
+
+  final uri = Uri.parse(nextUrl); //baseUrl
+  final response = await http.post(uri); // Encode data to JSON if provided);
+
+  if (response.statusCode == 200) {
+    final Map<String, dynamic> jsonMap = json.decode(response.body);
+    return ShowDataModel.fromJson(jsonMap);
+  } else if (response.statusCode == 204) {
+    debugPrint('Get was successful, no content returned.');
+  } else {
+    debugPrint(
+      'Failed to receive get_show command. Status code: ${response.statusCode}',
+    );
+    throw Exception('Failed to get_show');
+  }
+  throw Exception('Failed to get_show');
+}
+
 Future<void> getSlide(String? showId, String? slideId) async {
   final Map<String, dynamic> data = {
     "showId?": showId ?? "active",
@@ -160,15 +189,11 @@ Future<void> getSlide(String? showId, String? slideId) async {
 
   final String actionId = 'get_slide';
   final String nextUrl = '$baseUrl?action=$actionId&data=${jsonEncode(data)}';
-  // debugPrint('test');
 
   final uri = Uri.parse(nextUrl); //baseUrl
   final response = await http.post(uri); // Encode data to JSON if provided);
 
   if (response.statusCode == 200) {
-    // debugPrint(
-    //   'Successful get_slide command. Response get_slide is: ${json.decode(response.body)}',
-    // );
     final Map<String, dynamic> jsonMap = json.decode(response.body);
   } else if (response.statusCode == 204) {
     // Handle success with no content

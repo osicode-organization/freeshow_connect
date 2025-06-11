@@ -1,7 +1,7 @@
-import '../../../domain/entity/projects_entity/projects_entity.dart';
+import '../../../domain/entity/all_projects_entity/all_projects_entity.dart';
 
-class ProjectsModel extends ProjectsEntity {
-  const ProjectsModel({
+class AllProjectsModel extends AllProjectsEntity {
+  const AllProjectsModel({
     required super.projectId,
     required super.projectName,
     required super.projectCreated,

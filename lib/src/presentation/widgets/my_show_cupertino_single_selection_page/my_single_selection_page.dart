@@ -120,7 +120,7 @@ class _MySingleSelectionPageState<T> extends State<MySingleSelectionPage<T>> {
                         checkMarkColor: widget.checkMarkColor,
                         enabled: item.enabled,
                         selectedTrailingIcon: widget.selectedTrailingIcon,
-                        onTapp: (item) {
+                        onTap: (item) {
                           // if (onChanged2 != null) {
                           //   onChanged2!(item);
                           // }
@@ -141,12 +141,4 @@ class _MySingleSelectionPageState<T> extends State<MySingleSelectionPage<T>> {
     );
   }
 
-  ValueChanged<T?>? onChanged2(newValue) {
-    setState(() {
-      _selected = newValue;
-    });
-    if (widget.onChanged != null) {
-      widget.onChanged!(_selected);
-    }
-  }
 }

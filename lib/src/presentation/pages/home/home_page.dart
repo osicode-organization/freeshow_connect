@@ -5,8 +5,6 @@ import 'package:freeshow_connect/dependency_injection/dependency_injection.dart'
 import 'package:freeshow_connect/src/domain/entity/port_status_entity.dart';
 import 'package:intl/intl.dart';
 
-import '../../../data/data_sources/http_calls.dart';
-
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 

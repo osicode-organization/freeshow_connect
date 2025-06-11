@@ -1,9 +1,8 @@
-import 'package:freeshow_connect/src/data/models/projects_models/project_shows_model.dart';
+import '../../../domain/entity/all_projects_entity/all_projects_entry_entity.dart';
+import 'all_projects_shows_model.dart';
 
-import '../../../domain/entity/projects_entity/project_entry_entity.dart';
-
-class ProjectEntryModel extends ProjectEntryEntity {
-  const ProjectEntryModel({
+class AllProjectsEntryModel extends AllProjectsEntryEntity {
+  const AllProjectsEntryModel({
     required super.name,
     required super.created,
     required super.parent,
@@ -12,12 +11,12 @@ class ProjectEntryModel extends ProjectEntryEntity {
     required super.used,
   });
 
-  factory ProjectEntryModel.fromJson(Map<dynamic, dynamic> map) {
+  factory AllProjectsEntryModel.fromJson(Map<dynamic, dynamic> map) {
     var showList =
         (map['shows'] as List<dynamic>)
-            .map((show) => ProjectShowsModel.fromJson(show))
+            .map((show) => AllProjectsShowsModel.fromJson(show))
             .toList();
-    return ProjectEntryModel(
+    return AllProjectsEntryModel(
       name: map['name'],
       created: map['created'],
       parent: map['parent'],

@@ -17,10 +17,8 @@ Future<String> getPublicIP() async {
       return ip;
     } else {
       throw Exception('Failed to load public IP: ${response.statusCode}');
-      return ipAddressError;
     }
   } catch (e) {
     throw Exception('Failed to get public IP: $e');
-    return ipAddressError;
   }
 }

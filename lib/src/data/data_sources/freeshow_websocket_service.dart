@@ -27,23 +27,23 @@ class FreeShowWebSocketService {
       // Listen for messages from the WebSocket
       _channel!.stream.listen(
         (message) {
-          print('Received message: $message');
+          debugPrint('Received message: $message');
           onMessageReceived(message);
         },
         onError: (error) {
-          print('WebSocket error: $error');
+          debugPrint('WebSocket error: $error');
           if (onError != null) onError!(error);
           _reconnect(); // Attempt to reconnect on error
         },
         onDone: () {
-          print('WebSocket disconnected.');
+          debugPrint('WebSocket disconnected.');
           if (onDisconnected != null) onDisconnected!();
           _reconnect(); // Attempt to reconnect on disconnection
         },
         cancelOnError: true, // Cancel subscription on first error
       );
     } catch (e) {
-      print('Error connecting to WebSocket: $e');
+      debugPrint('Error connecting to WebSocket: $e');
       if (onError != null) onError!(e);
       _reconnect(); // Attempt to reconnect on connection error
     }
@@ -58,21 +58,21 @@ class FreeShowWebSocketService {
       // Let's assume a structure like: {"action": "action_id", "data": {...}}
       final message = {'action': actionId, if (data != null) 'data': data};
       _channel!.sink.add(jsonEncode(message));
-      print('Sent WebSocket message: ${jsonEncode(message)}');
+      debugPrint('Sent WebSocket message: ${jsonEncode(message)}');
     } else {
-      print('WebSocket not connected. Cannot send message: $actionId');
+      debugPrint('WebSocket not connected. Cannot send message: $actionId');
     }
   }
 
   void disconnect() {
     _channel?.sink.close();
     _channel = null;
-    print('WebSocket manually disconnected.');
+    debugPrint('WebSocket manually disconnected.');
   }
 
   // Basic reconnection logic (can be more sophisticated)
   void _reconnect() {
-    print('Attempting to reconnect in 5 seconds...');
+    debugPrint('Attempting to reconnect in 5 seconds...');
     Future.delayed(const Duration(seconds: 5), () {
       if (_channel == null || _channel!.sink.done != null) {
         // Check if already closing/closed

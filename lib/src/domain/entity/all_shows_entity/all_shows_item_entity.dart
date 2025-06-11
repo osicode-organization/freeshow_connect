@@ -1,14 +1,14 @@
 import 'package:equatable/equatable.dart';
-import 'package:freeshow_connect/src/domain/entity/shows_entity/timestamps_entity.dart';
+import 'package:freeshow_connect/src/domain/entity/all_shows_entity/all_shows_timestamps_entity.dart';
 
-class ShowItemEntity extends Equatable {
+class AllShowsItemEntity extends Equatable {
   final String name;
   final String category;
-  final TimestampsEntity timestamps;
+  final AllShowsTimestampsEntity timestamps;
   final Map<String, dynamic> quickAccess;
   final String origin;
 
-  const ShowItemEntity({
+  const AllShowsItemEntity({
     required this.name,
     required this.category,
     required this.timestamps,

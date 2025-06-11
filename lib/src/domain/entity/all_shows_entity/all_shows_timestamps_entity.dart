@@ -1,11 +1,11 @@
 import 'package:equatable/equatable.dart';
 
-class TimestampsEntity extends Equatable {
+class AllShowsTimestampsEntity extends Equatable {
   final int created;
   final int modified;
   final int used;
 
-  const TimestampsEntity({
+  const AllShowsTimestampsEntity({
     required this.created,
     required this.modified,
     required this.used,

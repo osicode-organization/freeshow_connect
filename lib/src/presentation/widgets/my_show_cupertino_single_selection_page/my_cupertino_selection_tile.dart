@@ -11,7 +11,7 @@ class MyCupertinoSelectionTile<T> extends StatelessWidget {
   /// Optional, additional information. Typically a [Text] widget.
   final Widget? subtitle;
 
-  /// The value provided through the onTapp callback when this tile is tapped.
+  /// The value provided through the onTap callback when this tile is tapped.
   final T? value;
 
   /// If true, a check mark will be provided next to this option.
@@ -22,7 +22,7 @@ class MyCupertinoSelectionTile<T> extends StatelessWidget {
   final bool enabled;
 
   /// Called when a user taps this tile.
-  final void Function(T? value)? onTapp;
+  final void Function(T? value)? onTap;
 
   /// Optional checkMark color
   final Color? checkMarkColor;
@@ -37,7 +37,7 @@ class MyCupertinoSelectionTile<T> extends StatelessWidget {
     required this.checkMarkLocation,
     this.subtitle,
     this.value,
-    this.onTapp,
+    this.onTap,
     this.checkMarkColor,
     required this.enabled,
     super.key,
@@ -58,8 +58,8 @@ class MyCupertinoSelectionTile<T> extends StatelessWidget {
       leading:
           checkMarkLocation == WidgetSelectionLocation.leading ? _icon : null,
       onTap: () {
-        if (onTapp != null && enabled) {
-          onTapp!(value);
+        if (onTap != null && enabled) {
+          onTap!(value);
         }
       },
     );
