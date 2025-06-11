@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
-import 'package:freeshow_connect/src/data/data_sources/http_calls.dart'
-    show nextSlide_2;
 
 import '../../../data/data_sources/get_calls.dart';
+import '../../../data/data_sources/post_calls.dart';
+import '../../../data/models/projects_models/projects_model.dart';
 // import 'package:webview_flutter/webview_flutter.dart';
 
 class BitfocusPage extends StatefulWidget {
@@ -14,6 +15,7 @@ class BitfocusPage extends StatefulWidget {
 }
 
 class _BitfocusPageState extends State<BitfocusPage> {
+  List<ProjectsModel> projectsList = [];
   @override
   void initState() {
     super.initState();
@@ -21,6 +23,10 @@ class _BitfocusPageState extends State<BitfocusPage> {
 
   @override
   Widget build(BuildContext context) {
+    String? _value;
+    if (projectsList.isEmpty) {
+      _value = 'project';//projectsList[0].name;
+    }
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(
         middle: Text('Bitfocus Companion'),
@@ -29,14 +35,6 @@ class _BitfocusPageState extends State<BitfocusPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text('Move to next slide'),
-            CupertinoButton(
-              onPressed: () async {
-                await nextSlide_2();
-              },
-              color: CupertinoColors.systemMint,
-              child: const Text('Next slide'),
-            ),
             GutterExtraLarge(),
             Text('Get shows'),
             CupertinoButton(
@@ -50,10 +48,46 @@ class _BitfocusPageState extends State<BitfocusPage> {
             Text('Get projects'),
             CupertinoButton(
               onPressed: () async {
-                await getProjects();
+                final projects = await getProjects();
+                setState(() {
+                  projectsList = projects;
+                });
               },
               color: CupertinoColors.systemRed,
               child: const Text('Get projects'),
+            ),
+            GutterMedium(),
+            // CupertinoSegmentedControl(
+            //   children: children,
+            //   onValueChanged: onValueChanged,
+            // ),
+            if (projectsList.isNotEmpty)
+              CupertinoSlidingSegmentedControl(
+                children: {
+                  for (var item in projectsList) item.projectName: Text(item.projectName),
+                },
+                onValueChanged: (String? value) {
+                  setState(() {
+                    _value = value;
+                  });
+                },
+                groupValue: _value,
+              ),
+            Wrap(
+              children: [
+                ...projectsList.map(
+                  (toElement) => SizedBox(
+                    height: 50,
+                    width: 150,
+                    child: GestureDetector(
+                      onTap: () async {
+                        await selectProjectByName(toElement.projectName);
+                      },
+                      child: Card(child: Center(child: Text(toElement.projectName))),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

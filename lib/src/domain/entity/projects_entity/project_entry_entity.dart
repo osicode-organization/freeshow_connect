@@ -1,20 +1,21 @@
 import 'package:equatable/equatable.dart';
+import 'package:freeshow_connect/src/domain/entity/projects_entity/project_shows_entity.dart';
 
 class ProjectEntryEntity extends Equatable {
   final String name;
   final int created;
   final String parent;
-  final List<dynamic> shows;
-  final int? modified; // Optional field
-  final int? used; // Optional field
+  final List<ProjectShowsEntity> shows;
+  final int modified; // Optional field
+  final int used; // Optional field
 
   const ProjectEntryEntity({
     required this.name,
     required this.created,
     required this.parent,
     required this.shows,
-    this.modified,
-    this.used,
+    required this.modified,
+    required this.used,
   });
 
   @override
