@@ -9,7 +9,7 @@ class ShowSettingsModel extends ShowSettingsEntity {
   factory ShowSettingsModel.fromJson(Map<String, dynamic> json) {
     return ShowSettingsModel(
       activeLayout: json['activeLayout'],
-      template: json['template'],
+      template: json['template'].toString(),
     );
   }
 }

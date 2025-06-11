@@ -8,10 +8,14 @@ class ShowLayoutsModel extends ShowLayoutsEntity {
   });
 
   factory ShowLayoutsModel.fromJson(Map<String, dynamic> json) {
+    final dataList =
+        (json['slides'] as List<Map<String, dynamic>>)
+            .map((item) => {item.keys.toString(): item.values.toString()})
+            .toList();
     return ShowLayoutsModel(
       name: json['name'],
       notes: json['notes'],
-      slides: List<Map<String, String>>.from(json['slides']),
+      slides: dataList,
     );
   }
 }

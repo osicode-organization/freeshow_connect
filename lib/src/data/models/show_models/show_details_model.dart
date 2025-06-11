@@ -23,7 +23,7 @@ class ShowDetailsModel extends ShowDetailsEntity {
   factory ShowDetailsModel.fromJson(Map<String, dynamic> json) {
     return ShowDetailsModel(
       name: json['name'],
-      origin: json['origin'],
+      origin: json['origin'] ?? "",
       private: json['private'],
       category: json['category'],
       settings: ShowSettingsModel.fromJson(json['settings']),
