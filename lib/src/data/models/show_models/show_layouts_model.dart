@@ -8,10 +8,21 @@ class ShowLayoutsModel extends ShowLayoutsEntity {
   });
 
   factory ShowLayoutsModel.fromJson(Map<String, dynamic> json) {
-    final dataList =
+    /*final dataList =
         (json['slides'] as List<Map<String, dynamic>>)
             .map((item) => {item.keys.toString(): item.values.toString()})
-            .toList();
+            .toList();*/
+    final List<Map<String, dynamic>> slidesData =
+        (json['slides'] is List)
+            ? List<Map<String, dynamic>>.from(json['slides'] ?? [])
+            : [];
+
+    final dataList =
+        slidesData.isNotEmpty
+            ? slidesData
+                .map((item) => {item.keys.toString(): item.values.toString()})
+                .toList()
+            : <Map<String, String>>[];
     return ShowLayoutsModel(
       name: json['name'],
       notes: json['notes'],

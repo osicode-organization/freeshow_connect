@@ -1,169 +1,194 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_gutter/flutter_gutter.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../data/data_sources/get_calls.dart';
-import '../../../data/data_sources/post_calls.dart';
-import '../../../data/models/all_projects_models/all_projects_model.dart';
+import '../../../../dependency_injection/dependency_injection.dart';
+import '../../../data/data_sources/bible_call.dart';
+import '../../../data/models/bible_model.dart';
 
-class BiblePage extends StatefulWidget {
+class BiblePage extends ConsumerStatefulWidget {
   const BiblePage({super.key});
 
   @override
-  State<BiblePage> createState() => _BiblePageState();
+  ConsumerState<BiblePage> createState() => _BiblePageState();
 }
 
-class _BiblePageState extends State<BiblePage>
-    with SingleTickerProviderStateMixin {
-  late List<AllProjectsModel> projectsList = [];
-  late PageController _pageController;
+class _BiblePageState extends ConsumerState<BiblePage> {
+  final Map<int, Widget> segments = {
+    0: Text("Book"),
+    1: Text("Chapter"),
+    2: Text("Verse"),
+  };
+  late PageController _scripturePageController;
+  List<String> bibleList = [];
+  late Bible bible;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final data = await getProjects();
-      setState(() {
-        projectsList = data;
-      });
-    });
-    _pageController = PageController();
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  Future<void> fetchData() async {
-    final data = await getProjects();
-    setState(() {
-      projectsList = data;
-    });
+    _scripturePageController = PageController();
+    bible = bibleCall();
+    bibleList = bible.books.values.map((entry) => entry.abbreviation).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    int itemCount = projectsList.length;
+    final scriptures = ref.watch(bibleProvider);
+    List<int> chapters =
+        bible.books[scriptures.currentBook]?.chapters.keys.toList() ?? [];
+    int verseCount =
+        bible.books[scriptures.currentBook]?.chapters[scriptures
+            .currentChapter] ??
+        0;
+    List<int> verses = List.generate(verseCount, (index) => index + 1);
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: const Text('Bible'),
-        trailing: CupertinoButton(
-          child: Icon(CupertinoIcons.refresh_circled),
-          onPressed: () {
-            fetchData();
-          },
-        ),
-      ),
+      navigationBar: CupertinoNavigationBar(middle: Text("Scriptures")),
       child: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(
-              height: 60,
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 2,
-                  horizontal: 15.0,
-                ),
-                scrollDirection: Axis.horizontal,
-                itemCount: itemCount,
-                itemBuilder: (context, index) {
-                  return CupertinoButton(
-                    onPressed: () async {
-                      await selectProjectByName(
-                        projectsList[index].projectName,
-                      );
-                      _pageController.jumpToPage(index);
-                    },
-                    child: Text(projectsList[index].projectName),
-                  );
-                },
-                separatorBuilder: (_, i) => GutterMedium(),
-              ),
+            CupertinoSlidingSegmentedControl<int>(
+              groupValue: scriptures.selectedSegment,
+              children: segments,
+              onValueChanged: (int? newValue) {
+                ref.read(bibleProvider.notifier).setSelectedSegment = newValue!;
+                _scripturePageController.animateToPage(
+                  newValue,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.ease,
+                );
+              },
             ),
             Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: itemCount,
-                itemBuilder: (context, index) {
-                  final thisProject = projectsList[index];
-                  return Container(
-                    color: Color(0xff2a34da).withGreen(index * 50),
+              child: PageView(
+                controller: _scripturePageController,
+                physics: NeverScrollableScrollPhysics(),
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: GridView.builder(
+                      padding: EdgeInsets.all(10),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 5,
+                        crossAxisSpacing: 15,
+                        mainAxisSpacing: 15,
+                      ),
+                      itemCount: bibleList.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          key: Key(index.toString()),
+                          onTap: () {
+                            ref
+                                .read(bibleProvider.notifier)
+                                .setSelectedSegment = 1;
+                            _scripturePageController.animateToPage(
+                              1,
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.ease,
+                            );
+                            // get lonng bibleList[index]
+                            ref.read(bibleProvider.notifier).setCurrentVerse =
+                                chapters[index];
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: CupertinoColors.systemGrey5,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(child: Text(bibleList[index])),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
                     child: Column(
                       children: [
-                        Text('data $index'),
-                        GutterMedium(),
-                        /* Project shows */
-                        if (thisProject.projectShows.isNotEmpty)
-                          SizedBox(
-                            height: 200,
-                            child: ListView.separated(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 2,
-                                horizontal: 15.0,
-                              ),
-                              scrollDirection: Axis.horizontal,
-                              itemCount: thisProject.projectShows.length,
-                              itemBuilder: (context, index) {
-                                return CupertinoButton.filled(
-                                  child: Text(
-                                    thisProject.projectShows[index].name,
+                        Text(scriptures.currentBook),
+                        Expanded(
+                          child: GridView.builder(
+                            padding: EdgeInsets.all(10),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 5,
+                                  crossAxisSpacing: 15,
+                                  mainAxisSpacing: 15,
+                                ),
+                            itemCount: chapters.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                key: Key(index.toString()),
+                                onTap: () {
+                                  ref
+                                      .read(bibleProvider.notifier)
+                                      .setSelectedSegment = 2;
+                                  _scripturePageController.animateToPage(
+                                    2,
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.ease,
+                                  );
+                                  ref
+                                      .read(bibleProvider.notifier)
+                                      .setCurrentVerse = chapters[index];
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: CupertinoColors.systemGrey5,
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-                                  onPressed: () async {
-                                    await selectShowByName(
-                                      thisProject.projectShows[index].name,
-                                    );
-                                    await startShow(
-                                      thisProject.projectShows[index].showId,
-                                    );
-                                    await getSlide(
-                                      thisProject.projectShows[index].showId,
-                                      null,
-                                    );
-                                    await getSlideThumbnail(
-                                      thisProject.projectShows[index].showId,
-                                      null,
-                                      null,
-                                    );
-                                  },
-                                );
-                              },
-                              separatorBuilder: (_, _) => GutterMedium(),
-                            ),
-                          ),
-                        GutterLarge(),
-                        /*  Slide buttons */
-                        SizedBox(
-                          height: 50,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 15.0,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                CupertinoButton(
-                                  onPressed: () async {
-                                    await previousSlide();
-                                  },
-                                  color: CupertinoColors.systemGrey,
-                                  child: const Text('Previous slide'),
+                                  child: Center(
+                                    child: Text(chapters[index].toString()),
+                                  ),
                                 ),
-                                CupertinoButton.filled(
-                                  onPressed: () async {
-                                    await nextSlide();
-                                  },
-                                  // color: CupertinoColors.systemMint,
-                                  child: const Text('Next slide'),
-                                ),
-                              ],
-                            ),
+                              );
+                            },
                           ),
                         ),
                       ],
                     ),
-                  );
-                },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          "${scriptures.currentBook} ${scriptures.currentChapter.toString()}",
+                        ),
+                        Expanded(
+                          child: GridView.builder(
+                            padding: EdgeInsets.all(10),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 5,
+                                  crossAxisSpacing: 15,
+                                  mainAxisSpacing: 15,
+                                ),
+                            itemCount: verses.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                key: Key(index.toString()),
+                                onTap: () {
+                                  ref
+                                      .read(bibleProvider.notifier)
+                                      .setCurrentVerse = verses[index];
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: CupertinoColors.systemGrey5,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Center(
+                                    child: Text(verses[index].toString()),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

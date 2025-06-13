@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
+import 'package:freeshow_connect/src/data/data_sources/bible_call.dart';
 
 import '../../../data/data_sources/get_calls.dart';
 import '../../../data/data_sources/post_calls.dart';
@@ -35,13 +36,13 @@ class _BitfocusPageState extends State<BitfocusPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             GutterExtraLarge(),
-            Text('Get shows'),
+            Text('Get bible'),
             CupertinoButton(
-              onPressed: () async {
-                await getAllShows();
+              onPressed: ()  {
+                bibleCall();
               },
               color: CupertinoColors.systemIndigo,
-              child: const Text('Get shows'),
+              child: const Text('Get bible'),
             ),
             GutterExtraLarge(),
             Text('Get projects'),

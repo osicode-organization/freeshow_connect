@@ -3,7 +3,7 @@ import 'package:freeshow_connect/src/data/models/show_models/show_details_model.
 import '../../../domain/entity/show_entity/show_data_entity.dart';
 
 class ShowDataModel extends ShowDataEntity {
-  ShowDataModel({
+  const ShowDataModel({
     required super.action,
     required super.id,
     required super.data,
@@ -13,7 +13,7 @@ class ShowDataModel extends ShowDataEntity {
     return ShowDataModel(
       action: json['action'],
       id: json['id'],
-      data: ShowDetailsModel.fromJson(json['data']),
+      data: ShowDetailsModel.fromJson(json['data'], json['id']),
     );
   }
 }

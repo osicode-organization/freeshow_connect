@@ -4,6 +4,7 @@ import 'package:freeshow_connect/src/presentation/pages/home/home_page.dart';
 import 'package:freeshow_connect/src/presentation/pages/settings/settings_page.dart';
 
 import '../bible/bible_page.dart';
+import '../projects/projects_page.dart';
 
 class BasePage extends StatefulWidget {
   const BasePage({super.key});
@@ -27,6 +28,10 @@ class _BasePageState extends State<BasePage> {
             label: 'Search',
           ),
           BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.wrench),
+            label: 'Projects',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.book),
             label: 'Bible',
           ),
@@ -45,8 +50,10 @@ class _BasePageState extends State<BasePage> {
           case 1:
             return const BitfocusPage();
           case 2:
-            return const BiblePage();
+            return const ProjectsPage();
           case 3:
+            return const BiblePage();
+          case 4:
             return const SettingsPage();
           default:
             return const HomePage();

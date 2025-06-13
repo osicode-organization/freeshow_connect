@@ -26,7 +26,7 @@ Future<void> previousSlide() async {
 Future<void> selectSlideByIndex(
   String showId,
   String layoutId,
-  String index,
+  int index,
 ) async {
   final Map<String, dynamic> data = {
     "showId?": showId,

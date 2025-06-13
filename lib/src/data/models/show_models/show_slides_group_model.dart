@@ -12,7 +12,7 @@ class ShowSlidesGroupModel extends ShowSlidesGroupEntity {
   });
   factory ShowSlidesGroupModel.fromJson(Map<String, dynamic> json) {
     return ShowSlidesGroupModel(
-      group: json['group'],
+      group: json['group'] ?? "",
       color: json['color'] ?? "",
       settings: json['settings'] ?? {},
       notes: json['notes'],
@@ -20,7 +20,7 @@ class ShowSlidesGroupModel extends ShowSlidesGroupEntity {
           (json['items'] as List<dynamic>)
               .map((item) => ShowSlidesItemsModel.fromJson(item))
               .toList(),
-      globalGroup: json['globalGroup'],
+      globalGroup: json['globalGroup'] ?? "",
     );
   }
 }

@@ -20,11 +20,11 @@ class ShowDetailsModel extends ShowDetailsEntity {
     required super.showId,
   });
 
-  factory ShowDetailsModel.fromJson(Map<String, dynamic> json) {
+  factory ShowDetailsModel.fromJson(Map<String, dynamic> json, String id) {
     return ShowDetailsModel(
       name: json['name'],
       origin: json['origin'] ?? "",
-      private: json['private'],
+      private: json['private'] ?? false,
       category: json['category'],
       settings: ShowSettingsModel.fromJson(json['settings']),
       timestamps: ShowTimestampsModel.fromJson(json['timestamps']),
@@ -37,7 +37,7 @@ class ShowDetailsModel extends ShowDetailsEntity {
         (key, value) => MapEntry(key, ShowLayoutsModel.fromJson(value)),
       ),
       media: json['media'] ?? {},
-      showId: json['id'],
+      showId: id,
     );
   }
 }
