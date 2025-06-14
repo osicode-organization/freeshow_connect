@@ -5,7 +5,7 @@ class ShowNotifier extends ChangeNotifier {
   String get showId => _showId;
   String _layoutId = '';
   String get layoutId => _layoutId;
-  int _currentSlide = 0;
+  int _currentSlide = 1;
   int get currentSlide => _currentSlide;
   int _totalSlides = -1;
   int get totalSlides => _totalSlides;
@@ -27,6 +27,16 @@ class ShowNotifier extends ChangeNotifier {
   set setTotalSlides(int slides) {
     _totalSlides = slides;
     debugPrint('total slide is $_totalSlides');
+    notifyListeners();
+  }
+
+  increaseCurrentSlide() {
+    _currentSlide++;
+    notifyListeners();
+  }
+
+  decreaseCurrentSlide() {
+    _currentSlide--;
     notifyListeners();
   }
 }

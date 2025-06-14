@@ -2,8 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freeshow_connect/dependency_injection/dependency_injection.dart';
-import 'package:freeshow_connect/src/domain/entity/port_status_entity.dart';
-import 'package:intl/intl.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
@@ -36,38 +35,16 @@ class _HomePageState extends ConsumerState<HomePage> {
 
     final asyncPortStatus = ref.watch(portStatusStreamProvider);
 
-    ref.listen<AsyncValue<PortStatusEntity>>(portStatusStreamProvider, (
-      previous,
-      next,
-    ) {
-      next.when(
-        data: (status) {
-          ref
-              .read(ipAddressProvider.notifier)
-              .setConnectionStatus(status.isOpen);
-        },
-        loading: () {
-          // Optional: Handle loading state updates
-        },
-        error: (err, stack) {
-          // Optional: Handle error state updates
-          ref.read(ipAddressProvider.notifier).setConnectionStatus(false);
-        },
-      );
-    });
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: const Text('Freeshow connect app'),
         trailing:
             localIp.connectionStatus
                 ? Icon(
-                  CupertinoIcons.check_mark_circled_solid,
+                  HeroIcons.check_circle,
                   color: CupertinoColors.systemGreen,
                 )
-                : Icon(
-                  CupertinoIcons.xmark_circle_fill,
-                  color: CupertinoColors.systemRed,
-                ),
+                : Icon(HeroIcons.x_circle, color: CupertinoColors.systemRed),
       ),
       child: SafeArea(
         child: Padding(
@@ -109,7 +86,16 @@ class _HomePageState extends ConsumerState<HomePage> {
                       ipButtonStatus
                           ? CupertinoColors.systemBlue
                           : CupertinoColors.systemFill,
-                  child: Text(ipButtonStatus ? 'Activate' : 'Deactivate'),
+                  child:
+                      ipButtonStatus
+                          ? Text(
+                            'Activate',
+                            style: TextStyle(color: CupertinoColors.white),
+                          )
+                          : Text(
+                            'Deactivate',
+                            style: TextStyle(color: CupertinoColors.systemGrey),
+                          ),
                   onPressed: () {
                     setState(() {
                       ipButtonStatus = !ipButtonStatus;
@@ -147,7 +133,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                           ),
                         ),
                       ),
-                      if (asyncPortStatus.value!.responseTime != null)
+                      /*if (asyncPortStatus.value!.responseTime != null)
                         Text(
                           'Response: ${asyncPortStatus.value!.responseTime}ms',
                         ),
@@ -155,7 +141,7 @@ class _HomePageState extends ConsumerState<HomePage> {
                         Text('Error: ${asyncPortStatus.value!.error}'),
                       Text(
                         'Last checked: ${DateFormat('HH:mm:ss').format(asyncPortStatus.value!.lastChecked)}',
-                      ),
+                      ),*/
                     ],
                   ),
               ],

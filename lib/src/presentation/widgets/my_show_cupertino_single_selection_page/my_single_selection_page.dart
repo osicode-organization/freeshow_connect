@@ -5,6 +5,7 @@ import 'package:cupertino_lists_enhanced/widget_location.dart';
 import 'package:flutter/cupertino.dart';
 // import 'package:flutter/material.dart';
 import 'package:freeshow_connect/src/presentation/widgets/my_show_cupertino_single_selection_page/my_cupertino_selection_tile.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 class MySingleSelectionPage<T> extends StatefulWidget {
   /// Widget to be displayed on the [AppBar]/[CupertinoNavigationBar] of the scaffold.
@@ -89,7 +90,7 @@ class _MySingleSelectionPageState<T> extends State<MySingleSelectionPage<T>> {
         middle: widget.title,
         leading: CupertinoButton(
           padding: EdgeInsets.zero,
-          child: Icon(CupertinoIcons.chevron_back),
+          child: Icon(HeroIcons.chevron_left),
           onPressed: () {
             Navigator.of(context).pop();
           },

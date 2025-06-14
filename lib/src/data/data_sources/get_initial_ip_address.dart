@@ -2,8 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-const String ipAddressError = 'ERROR';
-final String publicIpAddress = '192.168.1.1';
+import '../../../main.dart';
 
 Future<String> getPublicIP() async {
   try {
@@ -16,9 +15,11 @@ Future<String> getPublicIP() async {
       final String ip = data['ip'];
       return ip;
     } else {
-      throw Exception('Failed to load public IP: ${response.statusCode}');
+      // throw Exception('Failed to load public IP: ${response.statusCode}');
+      return ipAddressError;
     }
   } catch (e) {
-    throw Exception('Failed to get public IP: $e');
+    // throw Exception('Failed to get public IP: $e');
+    return ipAddressError;
   }
 }

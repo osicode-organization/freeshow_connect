@@ -25,6 +25,10 @@ Bible bibleCall() {
   debugPrint(
     "1 John is  ${chapterCounts.toString()} and verse count is $verseCount",
   );
+  String bookFromAbr =
+      bible.books.values.firstWhere((test) => test.abbreviation == "2Jn").name;
+  debugPrint(bookFromAbr);
+
   // bible.books.forEach((key, value) {});
   return bible;
 }

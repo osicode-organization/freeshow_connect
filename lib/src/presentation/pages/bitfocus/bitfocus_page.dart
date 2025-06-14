@@ -1,24 +1,42 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:freeshow_connect/dependency_injection/dependency_injection.dart';
 import 'package:freeshow_connect/src/data/data_sources/bible_call.dart';
 
-import '../../../data/data_sources/get_calls.dart';
-import '../../../data/data_sources/post_calls.dart';
-import '../../../data/models/all_projects_models/all_projects_model.dart';
+import '../../../domain/entity/all_projects_entity/all_projects_entity.dart';
 
-class BitfocusPage extends StatefulWidget {
+class BitfocusPage extends ConsumerStatefulWidget {
   const BitfocusPage({super.key});
 
   @override
-  State<BitfocusPage> createState() => _BitfocusPageState();
+  ConsumerState<BitfocusPage> createState() => _BitfocusPageState();
 }
 
-class _BitfocusPageState extends State<BitfocusPage> {
-  List<AllProjectsModel> projectsList = [];
+class _BitfocusPageState extends ConsumerState<BitfocusPage> {
+  List<AllProjectsEntity> projectsList = [];
+  String projectListError = '';
   @override
   void initState() {
     super.initState();
+  }
+
+  Future<void> fetchData() async {
+    final info =
+        await ref.read(getCallsRepositoryImplProvider).callGetProjects();
+    info.match(
+      (failure) {
+        setState(() {
+          projectListError = failure;
+        });
+      },
+      (data) {
+        setState(() {
+          projectsList = data;
+        });
+      },
+    );
   }
 
   @override
@@ -27,6 +45,7 @@ class _BitfocusPageState extends State<BitfocusPage> {
     if (projectsList.isEmpty) {
       value = 'project'; //projectsList[0].name;
     }
+    final providePostCalls = ref.watch(postCallsProvider);
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(
         middle: Text('Bitfocus Companion'),
@@ -38,7 +57,7 @@ class _BitfocusPageState extends State<BitfocusPage> {
             GutterExtraLarge(),
             Text('Get bible'),
             CupertinoButton(
-              onPressed: ()  {
+              onPressed: () {
                 bibleCall();
               },
               color: CupertinoColors.systemIndigo,
@@ -48,10 +67,7 @@ class _BitfocusPageState extends State<BitfocusPage> {
             Text('Get projects'),
             CupertinoButton(
               onPressed: () async {
-                final projects = await getProjects();
-                setState(() {
-                  projectsList = projects;
-                });
+                await fetchData();
               },
               color: CupertinoColors.systemRed,
               child: const Text('Get projects'),
@@ -82,7 +98,9 @@ class _BitfocusPageState extends State<BitfocusPage> {
                     width: 150,
                     child: GestureDetector(
                       onTap: () async {
-                        await selectProjectByName(toElement.projectName);
+                        await ref
+                            .read(postCallsProvider)
+                            .selectProjectByName(toElement.projectName);
                       },
                       child: Card(
                         child: Center(child: Text(toElement.projectName)),

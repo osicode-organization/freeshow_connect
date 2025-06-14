@@ -1,17 +1,20 @@
 import 'package:cupertino_lists_enhanced/list_section.dart';
 import 'package:cupertino_lists_enhanced/selection_item.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:icons_plus/icons_plus.dart';
 
+import '../../../../dependency_injection/dependency_injection.dart';
 import '../../widgets/my_show_cupertino_single_selection_page/my_show_cupertino_single_selection_page.dart';
 
-class SettingsPage extends StatefulWidget {
+class SettingsPage extends ConsumerStatefulWidget {
   const SettingsPage({super.key});
 
   @override
-  State<SettingsPage> createState() => _SettingsPageState();
+  ConsumerState<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsPageState extends State<SettingsPage> {
+class _SettingsPageState extends ConsumerState<SettingsPage> {
   String appearanceValue = "Automatic";
   @override
   Widget build(BuildContext context) {
@@ -30,12 +33,20 @@ class _SettingsPageState extends State<SettingsPage> {
                     context: context,
                     title: const Text("Appearance"),
                     initial: appearanceValue,
-                    selectedTrailingIcon:
-                        CupertinoIcons.check_mark_circled_solid,
+                    selectedTrailingIcon: HeroIcons.check_circle,
                     onChanged: (newValue) {
                       setState(() {
                         appearanceValue = newValue!;
                       });
+                      if (newValue == "Automatic") {
+                        ref.read(appModeProvider).setAutomaticMode();
+                      }
+                      if (newValue == "Light") {
+                        ref.read(appModeProvider).setAppThemeStatus = true;
+                      }
+                      if (newValue == "Dark") {
+                        ref.read(appModeProvider).setAppThemeStatus = false;
+                      }
                     },
                     children: [
                       SelectionItem<String>(
@@ -53,7 +64,11 @@ class _SettingsPageState extends State<SettingsPage> {
                     ],
                   );
                 },
-                trailing: const CupertinoListTileChevron(),
+                trailing: Icon(
+                  HeroIcons.chevron_right,
+                  size: CupertinoTheme.of(context).textTheme.textStyle.fontSize,
+                  color: CupertinoColors.systemGrey2.resolveFrom(context),
+                ),
               ),
             ],
           ),

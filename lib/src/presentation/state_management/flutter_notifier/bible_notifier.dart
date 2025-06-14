@@ -23,6 +23,16 @@ class BibleNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  incrementVerse() {
+    _currentVerse++;
+    notifyListeners();
+  }
+
+  decrementVerse() {
+    _currentVerse--;
+    notifyListeners();
+  }
+
   int _selectedSegment = 0;
   int get selectedSegment => _selectedSegment;
   set setSelectedSegment(int value) {

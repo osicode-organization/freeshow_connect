@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:freeshow_connect/src/presentation/pages/bitfocus/bitfocus_page.dart';
 import 'package:freeshow_connect/src/presentation/pages/home/home_page.dart';
 import 'package:freeshow_connect/src/presentation/pages/settings/settings_page.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 import '../bible/bible_page.dart';
 import '../projects/projects_page.dart';
@@ -20,23 +21,16 @@ class _BasePageState extends State<BasePage> {
       tabBar: CupertinoTabBar(
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.home),
+            icon: Icon(HeroIcons.home),
             label: 'Home',
           ),
+          BottomNavigationBarItem(icon: Icon(HeroIcons.wrench_screwdriver), label: 'Projects'),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.search),
-            label: 'Search',
+            icon: Icon(HeroIcons.book_open),
+            label: 'Scriptures',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.wrench),
-            label: 'Projects',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.book),
-            label: 'Bible',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.settings),
+            icon: Icon(HeroIcons.cog),
             label: 'Settings',
           ),
         ],
@@ -48,15 +42,13 @@ class _BasePageState extends State<BasePage> {
           case 0:
             return const HomePage();
           case 1:
-            return const BitfocusPage();
-          case 2:
             return const ProjectsPage();
-          case 3:
+          case 2:
             return const BiblePage();
-          case 4:
+          case 3:
             return const SettingsPage();
           default:
-            return const HomePage();
+            return const BitfocusPage();
         }
       },
     );

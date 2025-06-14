@@ -776,7 +776,7 @@ String bibleData = '''{
     }
   },
   "Song of Solomon": {
-    "abr": "Sng",
+    "abr": "Sos",
     "data": {
       "1": 17,
       "2": 17,

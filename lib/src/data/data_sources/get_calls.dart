@@ -7,6 +7,7 @@ import 'package:freeshow_connect/src/domain/entity/show_entity/show_data_entity.
 import 'package:freeshow_connect/src/domain/entity/show_entity/show_details_entity.dart';
 import 'package:http/http.dart' as http;
 
+import '../../core/error/exceptions/exceptions.dart';
 import '../models/all_projects_models/all_projects_data_model.dart';
 import '../models/all_projects_models/all_projects_model.dart';
 import '../models/all_shows_models/all_shows_data_model.dart';
@@ -20,21 +21,25 @@ Future<List<ShowDetailsEntity>> getAllShows() async {
   final String actionId = 'get_shows';
   final String nextUrl = '$baseUrl?action=$actionId&data=${jsonEncode(data)}';
 
-  final uri = Uri.parse(nextUrl);
-  final response = await http.post(uri);
+  try {
+    final uri = Uri.parse(nextUrl);
+    final response = await http.post(uri);
 
-  if (response.statusCode == 200) {
-    debugPrint('Successful get_shows command. Response is ${response.body}');
-    final Map<String, dynamic> jsonMap = json.decode(response.body);
-    return await allShowsModelList(jsonMap);
-  } else if (response.statusCode == 204) {
-    // Handle success with no content
-    debugPrint('Get was successful, no content returned.');
-  } else {
-    debugPrint(
-      'Failed to receive get_shows command. Status code: ${response.statusCode}',
-    );
-    throw Exception('Failed to get shows');
+    if (response.statusCode == 200) {
+      debugPrint('Successful get_shows command. Response is ${response.body}');
+      final Map<String, dynamic> jsonMap = json.decode(response.body);
+      return await allShowsModelList(jsonMap);
+    } else if (response.statusCode == 204) {
+      // Handle success with no content
+      debugPrint('Get was successful, no content returned.');
+    } else {
+      debugPrint(
+        'Failed to receive get_shows command. Status code: ${response.statusCode}',
+      );
+      throw ServerException('Failed to get shows');
+    }
+  } catch (e) {
+    throw ServerException("Connection error"); //e.toString()
   }
   return [];
 }
@@ -44,6 +49,9 @@ Future<List<ShowDetailsEntity>> allShowsModelList(
 ) async {
   final AllShowsDataModel showData = AllShowsDataModel.fromJson(jsonMap);
 
+  if (showData.data.isEmpty) {
+    throw ServerException('No shows found');
+  }
   final v =
       showData.data.entries
           .map(
@@ -66,25 +74,26 @@ Future<List<AllProjectsModel>> getProjects() async {
   final String nextUrl = '$baseUrl?action=$actionId&data=${jsonEncode(data)}';
   // debugPrint('test');
 
-  final uri = Uri.parse(nextUrl); //baseUrl
-  final response = await http.post(uri); // Encode data to JSON if provided);
+  try {
+    final uri = Uri.parse(nextUrl); //baseUrl
+    final response = await http.post(uri); // Encode data to JSON if provided);
 
-  if (response.statusCode == 200) {
-    // debugPrint(
-    //   'Successful get_projects command. Response project is decode ${json.decode(response.body)}',
-    // );
-    final Map<String, dynamic> jsonMap = json.decode(response.body);
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> jsonMap = json.decode(response.body);
 
-    final List<ShowDetailsEntity> allShows = await getAllShows();
-    return allProjectsModelList(jsonMap, allShows);
-  } else if (response.statusCode == 204) {
-    // Handle success with no content
-    debugPrint('Get was successful, no content returned.');
-  } else {
-    debugPrint(
-      'Failed to receive get_projects command. Status code: ${response.statusCode}',
-    );
-    throw Exception('Failed to get projects');
+      final List<ShowDetailsEntity> allShows = await getAllShows();
+      return allProjectsModelList(jsonMap, allShows);
+    } else if (response.statusCode == 204) {
+      // Handle success with no content
+      debugPrint('Get was successful, no content returned.');
+    } else {
+      debugPrint(
+        'Failed to receive get_projects command. Status code: ${response.statusCode}',
+      );
+      throw ServerException('Failed to get projects');
+    }
+  } catch (e) {
+    throw ServerException("Connection error"); //e.toString()
   }
   return [];
 }
@@ -98,6 +107,10 @@ List<AllProjectsModel> allProjectsModelList(
   );
 
   List<AllProjectsModel> projects = [];
+
+  if (projectData.data.isEmpty) {
+    throw ServerException('No projects found');
+  }
 
   projectData.data.forEach((key, projectEntry) {
     /*debugPrint('  Name: ${projectEntry.name}');

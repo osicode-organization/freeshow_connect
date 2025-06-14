@@ -3,32 +3,29 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_gutter/flutter_gutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:icons_plus/icons_plus.dart';
 
 import '../../../../dependency_injection/dependency_injection.dart';
-import '../../../data/data_sources/get_calls.dart';
-import '../../../data/data_sources/post_calls.dart';
-import '../../../data/models/all_projects_models/all_projects_model.dart';
+import '../../../domain/entity/all_projects_entity/all_projects_entity.dart';
 
 class ProjectsPage extends ConsumerStatefulWidget {
   const ProjectsPage({super.key});
 
   @override
-  ConsumerState<ProjectsPage> createState() => _BiblePageState();
+  ConsumerState<ProjectsPage> createState() => _ProjectsState();
 }
 
-class _BiblePageState extends ConsumerState<ProjectsPage>
+class _ProjectsState extends ConsumerState<ProjectsPage>
     with SingleTickerProviderStateMixin {
-  late List<AllProjectsModel> projectsList = [];
+  late List<AllProjectsEntity> projectsList = [];
   late PageController _pageController;
+  String projectListError = '';
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final data = await getProjects();
-      setState(() {
-        projectsList = data;
-      });
+      fetchData();
     });
     _pageController = PageController();
   }
@@ -40,217 +37,374 @@ class _BiblePageState extends ConsumerState<ProjectsPage>
   }
 
   Future<void> fetchData() async {
-    final data = await getProjects();
-    setState(() {
-      projectsList = data;
-    });
+    final info =
+        await ref.read(getCallsRepositoryImplProvider).callGetProjects();
+    info.match(
+      (failure) {
+        setState(() {
+          projectListError = failure;
+        });
+      },
+      (data) {
+        setState(() {
+          projectsList = data;
+        });
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     int itemCount = projectsList.length;
+    final show = ref.watch(showProvider);
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: const Text('Projects'),
         trailing: CupertinoButton(
-          child: Icon(CupertinoIcons.refresh_circled),
-          onPressed: () {
-            fetchData();
+          child: Icon(HeroIcons.arrow_path,),
+          onPressed: () async {
+            await fetchData();
           },
         ),
       ),
       child: SafeArea(
-        child: Column(
-          children: [
-            SizedBox(
-              height: 40,
-              child: ListView.separated(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 2,
-                  horizontal: 15.0,
-                ),
-                scrollDirection: Axis.horizontal,
-                itemCount: itemCount,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () async {
-                      await selectProjectByName(
-                        projectsList[index].projectName,
-                      );
-                      ref.read(projectProvider.notifier).setCurrentProject =
-                          index;
-                      ref.read(showProvider.notifier).setTotalSlides = -1;
-                      _pageController.jumpToPage(index);
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        color:
-                            ref.watch(projectProvider).currentProject == index
-                                ? CupertinoColors.activeOrange
-                                : CupertinoColors.transparent,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Center(
-                        child: Text(projectsList[index].projectName),
+        child:
+            projectsList.isEmpty
+                ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(projectListError),
+                      GutterMedium(),
+                      CupertinoActivityIndicator(),
+                    ],
+                  ),
+                )
+                : Column(
+                  children: [
+                    /*  ------------------ List all projects ------------------- */
+                    SizedBox(
+                      height: 40,
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 2,
+                          horizontal: 15.0,
+                        ),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: itemCount,
+                        itemBuilder: (context, index) {
+                          /*  ------------------ each project ------------------- */
+                          return GestureDetector(
+                            onTap: () async {
+                              await ref
+                                  .read(postCallsRepositoryImplProvider)
+                                  .selectProjectByName(
+                                    projectsList[index].projectName,
+                                  );
+                              ref
+                                  .read(projectProvider.notifier)
+                                  .setCurrentProject = index;
+                              ref.read(showProvider.notifier).setTotalSlides =
+                                  -1;
+                              ref.read(showProvider.notifier).setCurrentSlide =
+                                  1;
+                              _pageController.jumpToPage(index);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                color:
+                                    ref.watch(projectProvider).currentProject ==
+                                            index
+                                        ? CupertinoColors.systemBlue
+                                        : CupertinoColors.transparent,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Center(
+                                child: Text(projectsList[index].projectName),
+                              ),
+                            ),
+                          );
+                        },
+                        separatorBuilder: (_, i) => GutterMedium(),
                       ),
                     ),
-                  );
-                },
-                separatorBuilder: (_, i) => GutterMedium(),
-              ),
-            ),
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: itemCount,
-                itemBuilder: (context, index) {
-                  final thisProject = projectsList[index];
-                  return Container(
-                    // color: Color(0xff2a34da).withGreen(index * 50),
-                    child: Column(
-                      children: [
-                        Text('Shows'),
-                        GutterMedium(),
-                        /* Project shows */
-                        if (thisProject.projectShows.isNotEmpty)
-                          SizedBox(
-                            height: 200,
-                            child: ListView.separated(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 2,
-                                horizontal: 15.0,
-                              ),
-                              scrollDirection: Axis.horizontal,
-                              itemCount: thisProject.projectShows.length,
-                              itemBuilder: (context, index) {
-                                final normalSlidesMap =
-                                    thisProject.projectShows[index].slides;
-                                final lay =
-                                    thisProject.projectShows[index].layouts;
-                                List<String> layoutIds =
-                                    lay.entries.map((entry) {
-                                      return entry.key;
-                                    }).toList();
-                                List<int> layoutSlides =
-                                    lay.entries.map((entry) {
-                                      if (entry.value.slides.isNotEmpty) {
-                                        return entry.value.slides.length;
-                                      }
-                                      return 0;
-                                    }).toList();
-                                int normalSlides = normalSlidesMap.length;
-                                int totalSlides = max(
-                                  layoutSlides[0],
-                                  normalSlides,
-                                );
-                                return CupertinoButton.filled(
-                                  child: Text(
-                                    "${thisProject.projectShows[index].name}\nNumber of layout slides:  ${layoutSlides[0]}\nNumber of normal slides:  $normalSlides",
-                                  ),
-                                  onPressed: () async {
-                                    await selectShowByName(
-                                      thisProject.projectShows[index].name,
-                                    );
-                                    await startShow(
-                                      thisProject.projectShows[index].showId,
-                                    );
-                                    ref
-                                        .read(showProvider.notifier)
-                                        .setTotalSlides = totalSlides;
-                                    ref
-                                        .read(showProvider.notifier)
-                                        .setLayoutId = layoutIds[0];
-                                    ref.read(showProvider.notifier).setShowId =
-                                        thisProject.projectShows[index].showId;
-                                  },
-                                );
-                              },
-                              separatorBuilder: (_, _) => GutterMedium(),
-                            ),
-                          ),
-                        GutterLarge(),
-                        /*  ------------------ Previous and Next Slide buttons ------------------- */
-                        SizedBox(
-                          height: 50,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 15.0,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    /*  ------------------ List all shows for each project ------------------- */
+                    Expanded(
+                      child: PageView.builder(
+                        controller: _pageController,
+                        itemCount: itemCount,
+                        itemBuilder: (context, index) {
+                          final thisProject = projectsList[index];
+                          return SizedBox(
+                            child: Column(
                               children: [
-                                CupertinoButton(
-                                  onPressed: () async {
-                                    await previousSlide();
-                                  },
-                                  color: CupertinoColors.systemGrey,
-                                  child: const Text('Previous slide'),
-                                ),
-                                CupertinoButton.filled(
-                                  onPressed: () async {
-                                    await nextSlide();
-                                  },
-                                  // color: CupertinoColors.systemMint,
-                                  child: const Text('Next slide'),
-                                ),
+                                // Text('Shows'),
+                                GutterLarge(),
+                                /*  ------------------ shows in selected project ------------------- */
+                                if (thisProject.projectShows.isNotEmpty)
+                                  SizedBox(
+                                    height: 150,
+                                    child: ListView.separated(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 2,
+                                        horizontal: 15.0,
+                                      ),
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount:
+                                          thisProject.projectShows.length,
+                                      itemBuilder: (context, index) {
+                                        final normalSlidesMap =
+                                            thisProject
+                                                .projectShows[index]
+                                                .slides;
+                                        final lay =
+                                            thisProject
+                                                .projectShows[index]
+                                                .layouts;
+                                        List<String> layoutIds =
+                                            lay.entries.map((entry) {
+                                              return entry.key;
+                                            }).toList();
+                                        List<int> layoutSlides =
+                                            lay.entries.map((entry) {
+                                              if (entry
+                                                  .value
+                                                  .slides
+                                                  .isNotEmpty) {
+                                                return entry
+                                                    .value
+                                                    .slides
+                                                    .length;
+                                              }
+                                              return 0;
+                                            }).toList();
+                                        int normalSlides =
+                                            normalSlidesMap.length;
+                                        int totalSlides = max(
+                                          layoutSlides[0],
+                                          normalSlides,
+                                        );
+                                        /*  ------------------ each show ------------------- */
+                                        return CupertinoButton(
+                                          color:
+                                              show.showId ==
+                                                      thisProject
+                                                          .projectShows[index]
+                                                          .showId
+                                                  ? ref
+                                                          .watch(
+                                                            appModeProvider,
+                                                          )
+                                                          .switchThemeType
+                                                      ? CupertinoColors.black
+                                                      : CupertinoColors.white
+                                                  : CupertinoColors.systemGrey5,
+                                          child: Text(
+                                            thisProject
+                                                .projectShows[index]
+                                                .name,
+                                            style: TextStyle(
+                                              color:
+                                                  show.showId ==
+                                                          thisProject
+                                                              .projectShows[index]
+                                                              .showId
+                                                      ? ref
+                                                              .watch(
+                                                                appModeProvider,
+                                                              )
+                                                              .switchThemeType
+                                                          ? CupertinoColors
+                                                              .white
+                                                          : CupertinoColors
+                                                              .systemGrey5
+                                                              .darkColor
+                                                      : CupertinoColors
+                                                          .systemBlue,
+                                            ),
+                                          ),
+                                          onPressed: () async {
+                                            await ref
+                                                .read(
+                                                  postCallsRepositoryImplProvider,
+                                                )
+                                                .selectShowByName(
+                                                  thisProject
+                                                      .projectShows[index]
+                                                      .name,
+                                                );
+                                            await ref
+                                                .read(
+                                                  postCallsRepositoryImplProvider,
+                                                )
+                                                .startShow(
+                                                  thisProject
+                                                      .projectShows[index]
+                                                      .showId,
+                                                );
+                                            ref
+                                                .read(showProvider.notifier)
+                                                .setTotalSlides = totalSlides;
+                                            ref
+                                                .read(showProvider.notifier)
+                                                .setLayoutId = layoutIds[0];
+                                            ref
+                                                .read(showProvider.notifier)
+                                                .setShowId = thisProject
+                                                    .projectShows[index]
+                                                    .showId;
+
+                                            ref
+                                                .read(showProvider.notifier)
+                                                .setCurrentSlide = 1;
+                                          },
+                                        );
+                                      },
+                                      separatorBuilder:
+                                          (_, _) => GutterMedium(),
+                                    ),
+                                  ),
+                                GutterLarge(),
+                                /*  ------------------ Previous and Next Slide buttons ------------------- */
+                                if (show.totalSlides != -1)
+                                  SizedBox(
+                                    height: 50,
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 15.0,
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          /*  ------------------ Prev button ------------------- */
+                                          CupertinoButton(
+                                            onPressed:
+                                                show.currentSlide == 1
+                                                    ? null
+                                                    : () async {
+                                                      await ref
+                                                          .read(
+                                                            postCallsRepositoryImplProvider,
+                                                          )
+                                                          .previousSlide();
+                                                      ref
+                                                          .read(
+                                                            showProvider
+                                                                .notifier,
+                                                          )
+                                                          .decreaseCurrentSlide();
+                                                    },
+                                            color: CupertinoColors.systemGrey4,
+                                            child: const Text('Previous slide'),
+                                          ),
+                                          /*  ------------------ next slide ------------------- */
+                                          CupertinoButton.filled(
+                                            onPressed:
+                                                show.currentSlide ==
+                                                        show.totalSlides
+                                                    ? null
+                                                    : () async {
+                                                      await ref
+                                                          .read(
+                                                            postCallsRepositoryImplProvider,
+                                                          )
+                                                          .nextSlide();
+                                                      ref
+                                                          .read(
+                                                            showProvider
+                                                                .notifier,
+                                                          )
+                                                          .increaseCurrentSlide();
+                                                    },
+                                            // color: CupertinoColors.systemMint,
+                                            child: const Text('Next slide'),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                GutterLarge(),
+                                /*  ------------------ Slides ------------------- */
+                                if (show.totalSlides != -1)
+                                  Expanded(
+                                    child: GridView.builder(
+                                      padding: EdgeInsets.all(16),
+                                      gridDelegate:
+                                          SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount:
+                                                4, // Number of items in a row
+                                            crossAxisSpacing: 10,
+                                            mainAxisSpacing: 10,
+                                          ),
+                                      itemCount:
+                                          ref
+                                              .watch(showProvider)
+                                              .totalSlides, // Number of buttons
+                                      itemBuilder: (context, index) {
+                                        String showId = show.showId;
+                                        String layoutId = show.layoutId;
+                                        return CupertinoButton(
+                                          key: ValueKey(index.toString()),
+                                          color:
+                                              show.currentSlide == index + 1
+                                                  ? ref
+                                                          .watch(
+                                                            appModeProvider,
+                                                          )
+                                                          .switchThemeType
+                                                      ? CupertinoColors.black
+                                                      : CupertinoColors.white
+                                                  : CupertinoColors.systemGrey5,
+                                          child: Text(
+                                            '${index + 1}',
+                                            style: TextStyle(
+                                              color:
+                                                  show.currentSlide == index + 1
+                                                      ? ref
+                                                              .watch(
+                                                                appModeProvider,
+                                                              )
+                                                              .switchThemeType
+                                                          ? CupertinoColors
+                                                              .white
+                                                          : CupertinoColors
+                                                              .systemGrey5
+                                                              .darkColor
+                                                      : CupertinoColors
+                                                          .systemBlue,
+                                            ),
+                                          ),
+                                          onPressed: () async {
+                                            debugPrint(
+                                              'Button ${index + 1} pressed',
+                                            );
+                                            ref
+                                                .read(showProvider.notifier)
+                                                .setCurrentSlide = index + 1;
+                                            await ref
+                                                .read(
+                                                  postCallsRepositoryImplProvider,
+                                                )
+                                                .selectSlideByIndex(
+                                                  showId,
+                                                  layoutId,
+                                                  index + 1,
+                                                );
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ),
                               ],
                             ),
-                          ),
-                        ),
-                        GutterLarge(),
-                        /*  ------------------ Slide buttons ------------------- */
-                        if (ref.watch(showProvider).totalSlides != -1)
-                          Expanded(
-                            child: GridView.builder(
-                              padding: EdgeInsets.all(16),
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount:
-                                        4, // Number of items in a row
-                                    crossAxisSpacing: 10,
-                                    mainAxisSpacing: 10,
-                                  ),
-                              itemCount:
-                                  ref
-                                      .watch(showProvider)
-                                      .totalSlides, // Number of buttons
-                              itemBuilder: (context, index) {
-                                String showId = ref.watch(showProvider).showId;
-                                String layoutId =
-                                    ref.watch(showProvider).layoutId;
-                                int selectedSlide =
-                                    ref.watch(showProvider).currentSlide;
-                                return CupertinoButton(
-                                  key: ValueKey(index.toString()),
-                                  color:
-                                      selectedSlide == index
-                                          ? CupertinoColors.activeBlue
-                                          : CupertinoColors.inactiveGray,
-                                  child: Text('${index + 1}'),
-                                  onPressed: () async {
-                                    debugPrint('Button ${index + 1} pressed');
-                                    ref
-                                        .read(showProvider.notifier)
-                                        .setCurrentSlide = index;
-                                    await selectSlideByIndex(
-                                      showId,
-                                      layoutId,
-                                      index + 1,
-                                    );
-                                  },
-                                );
-                              },
-                            ),
-                          ),
-                      ],
+                          );
+                        },
+                      ),
                     ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
+                  ],
+                ),
       ),
     );
   }

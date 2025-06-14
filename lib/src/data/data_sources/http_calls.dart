@@ -1,28 +1,36 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
-final String baseUrl =
-    'http://localhost:5505'; //'http://10.0.2.2:5505';172.31.99.26
-// 'http://192.168.3.246:3000'; // Replace with your FreeShow API URL
-// 'http://127.0.0.1:5505'
+import '../../../dependency_injection/dependency_injection.dart';
 
-Future<void> loadSong(String songId) async {
-  // final String baseUrl = 'http://localhost:5505';
-  final response = await http.post(
-    Uri.parse('$baseUrl/api/control/loadSong'),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: jsonEncode(<String, String>{'songId': songId}),
-  );
+final String baseUrl = 'http://localhost:5505';
 
-  if (response.statusCode == 200) {
-    debugPrint('Loaded song with ID: $songId');
-  } else {
-    throw Exception('Failed to load song');
+class LoadSongs extends AsyncNotifier {
+  @override
+  FutureOr build() {
+    // return null;
+  }
+
+  Future<void> loadSong(String songId) async {
+    final String baseUrl = ref.watch(ipAddressProvider).localIP;
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/control/loadSong'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{'songId': songId}),
+    );
+
+    if (response.statusCode == 200) {
+      debugPrint('Loaded song with ID: $songId');
+    } else {
+      throw Exception('Failed to load song');
+    }
   }
 }
 
