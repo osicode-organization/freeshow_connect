@@ -79,13 +79,6 @@ class _ProjectsState extends ConsumerState<ProjectsPage>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(projectListError),
-                      CupertinoButton.filled(
-                        child: Text('data'),
-                        onPressed: () async {
-                          debugPrint('button press b');
-                          await fetchData();
-                        },
-                      ),
                       GutterMedium(),
                       CupertinoActivityIndicator(),
                     ],

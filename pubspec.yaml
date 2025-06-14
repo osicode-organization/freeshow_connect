@@ -48,6 +48,7 @@ dependencies:
   cupertino_icons: ^1.0.8
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.14.4
   flutter_test:
     sdk: flutter
 
@@ -60,7 +61,15 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
-
+flutter_launcher_icons:
+  image_path: assets/images/launch/android-chrome-512x512.png
+  android: true
+  image_path_android: assets/images/launch/android-chrome-512x512.png
+  adaptive_icon_boreground: "#000000"
+  adaptive_icon_foreground: assets/images/launch/favicon-16x16.png
+  ios: true
+  image_path_ios: assets/images/launch/apple-touch-icon.png
+  remove_alpha_ios: true
 # The following section is specific to Flutter packages.
 flutter:
 

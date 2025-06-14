@@ -23,13 +23,15 @@ Future<void> main() async {
   sharedPreferences = await SharedPreferences.getInstance();
   appThemeMode = sharedPreferences.getBool(appThemeModeKey) ?? true;
 
-  late String? publicIp;
+  /*late String? publicIp;
   String ip = await getPublicIP();
   if (ip != ipAddressError) {
     publicIp = ip;
   }
   localIpAddress =
-      sharedPreferences.getString(ipAddressKey) ?? publicIp ?? publicIpAddress;
+      sharedPreferences.getString(ipAddressKey) ?? publicIp ?? publicIpAddress;*/
+  localIpAddress =
+      sharedPreferences.getString(ipAddressKey) ?? publicIpAddress;
 
   runApp(ProviderScope(child: const FreeshowConnectApp()));
 }
