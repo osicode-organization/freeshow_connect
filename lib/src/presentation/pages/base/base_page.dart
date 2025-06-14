@@ -20,19 +20,16 @@ class _BasePageState extends State<BasePage> {
     return CupertinoTabScaffold(
       tabBar: CupertinoTabBar(
         items: const [
+          BottomNavigationBarItem(icon: Icon(HeroIcons.home), label: 'Home'),
           BottomNavigationBarItem(
-            icon: Icon(HeroIcons.home),
-            label: 'Home',
+            icon: Icon(HeroIcons.wrench_screwdriver),
+            label: 'Projects',
           ),
-          BottomNavigationBarItem(icon: Icon(HeroIcons.wrench_screwdriver), label: 'Projects'),
           BottomNavigationBarItem(
             icon: Icon(HeroIcons.book_open),
             label: 'Scriptures',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(HeroIcons.cog),
-            label: 'Settings',
-          ),
+          BottomNavigationBarItem(icon: Icon(HeroIcons.cog), label: 'Settings'),
         ],
         activeColor: CupertinoColors.systemBlue,
         inactiveColor: CupertinoColors.inactiveGray,

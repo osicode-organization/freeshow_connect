@@ -37,8 +37,10 @@ class _ProjectsState extends ConsumerState<ProjectsPage>
   }
 
   Future<void> fetchData() async {
+    debugPrint('before fetch');
     final info =
         await ref.read(getCallsRepositoryImplProvider).callGetProjects();
+    debugPrint('fetchData');
     info.match(
       (failure) {
         setState(() {
@@ -46,6 +48,7 @@ class _ProjectsState extends ConsumerState<ProjectsPage>
         });
       },
       (data) {
+        debugPrint("$data");
         setState(() {
           projectsList = data;
         });
@@ -61,8 +64,9 @@ class _ProjectsState extends ConsumerState<ProjectsPage>
       navigationBar: CupertinoNavigationBar(
         middle: const Text('Projects'),
         trailing: CupertinoButton(
-          child: Icon(HeroIcons.arrow_path,),
+          child: Icon(HeroIcons.arrow_path),
           onPressed: () async {
+            debugPrint('button press');
             await fetchData();
           },
         ),
@@ -75,6 +79,13 @@ class _ProjectsState extends ConsumerState<ProjectsPage>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(projectListError),
+                      CupertinoButton.filled(
+                        child: Text('data'),
+                        onPressed: () async {
+                          debugPrint('button press b');
+                          await fetchData();
+                        },
+                      ),
                       GutterMedium(),
                       CupertinoActivityIndicator(),
                     ],

@@ -67,7 +67,10 @@ class _BitfocusPageState extends ConsumerState<BitfocusPage> {
             Text('Get projects'),
             CupertinoButton(
               onPressed: () async {
-                await fetchData();
+                debugPrint('callGetProjects');
+                await ref
+                    .watch(getCallsRepositoryImplProvider)
+                    .callGetProjects(); //fetchData();
               },
               color: CupertinoColors.systemRed,
               child: const Text('Get projects'),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../src/data/data_repository/get_calls_repository_impl.dart';
 import '../src/data/data_repository/post_calls_repository_impl.dart';
 import '../src/data/data_sources/check_port_status.dart';
+import '../src/data/data_sources/get_calls.dart';
 import '../src/data/data_sources/post_calls.dart';
 import '../src/domain/entity/port_status_entity.dart';
 import '../src/presentation/state_management/flutter_notifier/app_mode_notifier.dart';
@@ -42,11 +43,16 @@ final postCallsProvider = Provider<PostCalls>(
   (ref) => PostCalls(ip: ref.watch(ipAddressProvider).localIP),
 );
 
+final getCallsProvider = Provider<GetCalls>(
+  (ref) => GetCalls(ip: ref.watch(ipAddressProvider).localIP),
+);
+
 final postCallsRepositoryImplProvider = Provider<PostCallsRepositoryImpl>(
   (ref) =>
       PostCallsRepositoryImpl(postCallsInstance: ref.watch(postCallsProvider)),
 );
 
 final getCallsRepositoryImplProvider = Provider<GetCallsRepositoryImpl>(
-  (ref) => GetCallsRepositoryImpl(),
+  (ref) =>
+      GetCallsRepositoryImpl(getCallsInstance: ref.watch(getCallsProvider)),
 );

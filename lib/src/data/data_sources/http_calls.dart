@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 
 import '../../../dependency_injection/dependency_injection.dart';
 
-final String baseUrl = 'http://localhost:5505';
+// final String baseUrl = 'http://localhost:5505';
 
 class LoadSongs extends AsyncNotifier {
   @override

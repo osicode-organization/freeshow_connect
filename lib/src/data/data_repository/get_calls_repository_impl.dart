@@ -7,10 +7,12 @@ import '../../domain/domain_repository/get_calls_repository_interface.dart';
 import '../../domain/entity/all_projects_entity/all_projects_entity.dart';
 
 class GetCallsRepositoryImpl implements GetCallsRepositoryInterface {
+  GetCalls getCallsInstance;
+  GetCallsRepositoryImpl({required this.getCallsInstance});
   @override
   Future<Either<String, List<AllProjectsEntity>>> callGetProjects() async {
     try {
-      final data = await getProjects();
+      final data = await getCallsInstance.getProjects();
       return data.isEmpty ? Left('Projects is empty') : Right(data);
     } on ServerException catch (e) {
       return Left(e.message);
@@ -20,7 +22,7 @@ class GetCallsRepositoryImpl implements GetCallsRepositoryInterface {
   @override
   Future<Either<String, List<ShowDetailsEntity>>> callGetShows() async {
     try {
-      final data = await getAllShows();
+      final data = await getCallsInstance.getAllShows();
       return data.isEmpty ? Left('Shows is empty') : Right(data);
     } on ServerException catch (e) {
       return Left(e.message);
