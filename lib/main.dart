@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freeshow_connect/src/config/app_theme/app_theme.dart';
-import 'package:freeshow_connect/src/data/data_sources/get_initial_ip_address.dart';
 import 'package:freeshow_connect/src/domain/entity/port_status_entity.dart';
 import 'package:freeshow_connect/src/presentation/pages/base/base_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,7 +20,10 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   sharedPreferences = await SharedPreferences.getInstance();
-  appThemeMode = sharedPreferences.getBool(appThemeModeKey) ?? true;
+  appThemeMode =
+      sharedPreferences.getBool(appThemeModeKey) ??
+      WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+          Brightness.light;
 
   /*late String? publicIp;
   String ip = await getPublicIP();
@@ -30,8 +32,7 @@ Future<void> main() async {
   }
   localIpAddress =
       sharedPreferences.getString(ipAddressKey) ?? publicIp ?? publicIpAddress;*/
-  localIpAddress =
-      sharedPreferences.getString(ipAddressKey) ?? publicIpAddress;
+  localIpAddress = sharedPreferences.getString(ipAddressKey) ?? publicIpAddress;
 
   runApp(ProviderScope(child: const FreeshowConnectApp()));
 }
@@ -45,7 +46,13 @@ class FreeshowConnectApp extends ConsumerStatefulWidget {
 
 class _FreeshowConnectAppState extends ConsumerState<FreeshowConnectApp> {
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    ref.watch(portStatusStreamProvider);
     ref.listen<AsyncValue<PortStatusEntity>>(portStatusStreamProvider, (
       previous,
       next,
@@ -68,7 +75,10 @@ class _FreeshowConnectAppState extends ConsumerState<FreeshowConnectApp> {
     return CupertinoApp(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
-      theme: ref.watch(appModeProvider).switchThemeType ? AppTheme.light() : AppTheme.dark(),
+      theme:
+          ref.watch(appModeProvider).switchThemeType
+              ? AppTheme.light()
+              : AppTheme.dark(),
       home: const BasePage(),
     );
   }

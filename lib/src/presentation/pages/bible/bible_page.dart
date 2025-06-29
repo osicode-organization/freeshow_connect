@@ -23,17 +23,34 @@ class _BiblePageState extends ConsumerState<BiblePage> {
   late PageController _scripturePageController;
   List<String> bibleListAbr = [];
   List<String> bibleListName = [];
-  late Bible bible;
+  late final Bible bible;
   String verseError = '';
+
+  List<int> chapters = [];
+  int verseCount = 0;
 
   @override
   void initState() {
     super.initState();
     _scripturePageController = PageController();
-    bible = bibleCall();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      callBible();
+    });
+  }
+
+  Future<void> callBible() async {
+    bible = await bibleCall();
     bibleListAbr =
         bible.books.values.map((entry) => entry.abbreviation).toList();
     bibleListName = bible.books.values.map((entry) => entry.name).toList();
+
+    final scriptures = ref.read(bibleProvider);
+    chapters =
+        bible.books[scriptures.currentBook]?.chapters.keys.toList() ?? [];
+    verseCount =
+        bible.books[scriptures.currentBook]?.chapters[scriptures
+            .currentChapter] ??
+        0;
   }
 
   @override
@@ -41,12 +58,6 @@ class _BiblePageState extends ConsumerState<BiblePage> {
     final localIp = ref.watch(ipAddressProvider);
 
     final scriptures = ref.watch(bibleProvider);
-    List<int> chapters =
-        bible.books[scriptures.currentBook]?.chapters.keys.toList() ?? [];
-    int verseCount =
-        bible.books[scriptures.currentBook]?.chapters[scriptures
-            .currentChapter] ??
-        0;
     List<int> verses = List.generate(verseCount, (index) => index + 1);
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(middle: Text("Scriptures")),
@@ -67,18 +78,25 @@ class _BiblePageState extends ConsumerState<BiblePage> {
               },
             ),
             Expanded(
-              child: PageView(
-                controller: _scripturePageController,
-                physics: NeverScrollableScrollPhysics(),
-                children: [
-                  /*  ------------------ Books ------------------- */
-                  booksPage(chapters),
-                  /*  ------------------ Chapters ------------------- */
-                  chapterPage(scriptures, chapters),
-                  /*  ------------------ Verses ------------------- */
-                  versePage(scriptures, verses, localIp.connectionStatus),
-                ],
-              ),
+              child:
+                  bibleListAbr.isEmpty
+                      ? Center(child: CupertinoActivityIndicator())
+                      : PageView(
+                        controller: _scripturePageController,
+                        physics: NeverScrollableScrollPhysics(),
+                        children: [
+                          /*  ------------------ Books ------------------- */
+                          booksPage(chapters),
+                          /*  ------------------ Chapters ------------------- */
+                          chapterPage(scriptures, chapters),
+                          /*  ------------------ Verses ------------------- */
+                          versePage(
+                            scriptures,
+                            verses,
+                            localIp.connectionStatus,
+                          ),
+                        ],
+                      ),
             ),
           ],
         ),
@@ -122,9 +140,10 @@ class _BiblePageState extends ConsumerState<BiblePage> {
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                      color: ref.watch(appModeProvider).switchThemeType
-                          ? CupertinoColors.systemGrey5
-                          : CupertinoColors.systemGrey5.darkColor,
+                      color:
+                          ref.watch(appModeProvider).switchThemeType
+                              ? CupertinoColors.systemGrey5
+                              : CupertinoColors.systemGrey5.darkColor,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Center(
@@ -180,9 +199,10 @@ class _BiblePageState extends ConsumerState<BiblePage> {
                   },
                   child: Container(
                     decoration: BoxDecoration(
-                      color: ref.watch(appModeProvider).switchThemeType
-                          ? CupertinoColors.systemGrey5
-                          : CupertinoColors.systemGrey5.darkColor,
+                      color:
+                          ref.watch(appModeProvider).switchThemeType
+                              ? CupertinoColors.systemGrey5
+                              : CupertinoColors.systemGrey5.darkColor,
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Center(
@@ -207,11 +227,11 @@ class _BiblePageState extends ConsumerState<BiblePage> {
     } else if (index >= 5 && index < 17) {
       return Color(0xff23ad32);
     } else if (index >= 17 && index < 22) {
-      return Color(0xff19647E);
+      return Color(0xff1914fe);
     } else if (index >= 22 && index < 27) {
-      return Color(0xff66101F);
+      return Color(0xffd6101F);
     } else {
-      return Color(0xff5941A9);
+      return Color(0xfff941A9);
     }
   }
 
@@ -223,9 +243,9 @@ class _BiblePageState extends ConsumerState<BiblePage> {
     } else if (index >= 5 && index < 19) {
       return Color(0xff027BCE);
     } else if (index >= 19 && index < 26) {
-      return Color(0xff66101F);
+      return Color(0xffdf101f);
     } else {
-      return Color(0xff136F63);
+      return Color(0xff13aF63);
     }
   }
 

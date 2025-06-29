@@ -60,10 +60,11 @@ class _ProjectsState extends ConsumerState<ProjectsPage>
   Widget build(BuildContext context) {
     int itemCount = projectsList.length;
     final show = ref.watch(showProvider);
+    final sendCall = ref.read(postCallsRepositoryImplProvider);
     return CupertinoPageScaffold(
       navigationBar: CupertinoNavigationBar(
         middle: const Text('Projects'),
-        trailing: CupertinoButton(
+        trailing: CupertinoButton.filled(
           child: Icon(HeroIcons.arrow_path),
           onPressed: () async {
             debugPrint('button press');
@@ -229,24 +230,16 @@ class _ProjectsState extends ConsumerState<ProjectsPage>
                                             ),
                                           ),
                                           onPressed: () async {
-                                            await ref
-                                                .read(
-                                                  postCallsRepositoryImplProvider,
-                                                )
-                                                .selectShowByName(
-                                                  thisProject
-                                                      .projectShows[index]
-                                                      .name,
-                                                );
-                                            await ref
-                                                .read(
-                                                  postCallsRepositoryImplProvider,
-                                                )
-                                                .startShow(
-                                                  thisProject
-                                                      .projectShows[index]
-                                                      .showId,
-                                                );
+                                            await sendCall.selectShowByName(
+                                              thisProject
+                                                  .projectShows[index]
+                                                  .name,
+                                            );
+                                            /*await sendCall.startShow(
+                                              thisProject
+                                                  .projectShows[index]
+                                                  .showId,
+                                            );*/
                                             ref
                                                 .read(showProvider.notifier)
                                                 .setTotalSlides = totalSlides;
@@ -387,10 +380,7 @@ class _ProjectsState extends ConsumerState<ProjectsPage>
                                             ref
                                                 .read(showProvider.notifier)
                                                 .setCurrentSlide = index + 1;
-                                            await ref
-                                                .read(
-                                                  postCallsRepositoryImplProvider,
-                                                )
+                                            await sendCall
                                                 .selectSlideByIndex(
                                                   showId,
                                                   layoutId,

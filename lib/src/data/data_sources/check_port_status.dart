@@ -13,12 +13,14 @@ Stream<PortStatusEntity> checkPortStatus(
     try {
       final socket = await Socket.connect(host, port, timeout: timeout);
       socket.destroy();
+      // debugPrint('port is open');
       yield PortStatusEntity(
         isOpen: true,
         responseTime: stopwatch.elapsedMilliseconds,
         lastChecked: DateTime.now(),
       );
     } catch (e) {
+      // debugPrint('port is error');
       yield PortStatusEntity(
         isOpen: false,
         error: e.toString(),
