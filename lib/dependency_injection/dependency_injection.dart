@@ -36,7 +36,10 @@ final appModeProvider = ChangeNotifierProvider<AppModeNotifier>(
 /// Providers
 final portStatusStreamProvider = StreamProvider<PortStatusEntity>((ref) {
   // debugPrint(' problem here?');
-  return checkPortStatus(ref.watch(ipAddressProvider).localIP, 5505);
+  return PortStatus(
+    host: ref.watch(ipAddressProvider).localIP,
+    port: 5505,
+  ).checkPortStatus();
 });
 
 final postCallsProvider = Provider<PostCalls>(

@@ -52,7 +52,6 @@ class _FreeshowConnectAppState extends ConsumerState<FreeshowConnectApp> {
 
   @override
   Widget build(BuildContext context) {
-    ref.watch(portStatusStreamProvider);
     ref.listen<AsyncValue<PortStatusEntity>>(portStatusStreamProvider, (
       previous,
       next,
@@ -62,12 +61,13 @@ class _FreeshowConnectAppState extends ConsumerState<FreeshowConnectApp> {
           ref
               .read(ipAddressProvider.notifier)
               .setConnectionStatus(status.isOpen);
+          // debugPrint('main Status ${status.isOpen}');
         },
         loading: () {
-          // Optional: Handle loading state updates
+          // debugPrint('main loading');
         },
         error: (err, stack) {
-          // Optional: Handle error state updates
+          // debugPrint('main error ${err.toString()}');
           ref.read(ipAddressProvider.notifier).setConnectionStatus(false);
         },
       );

@@ -5,6 +5,7 @@ class BibleNotifier extends ChangeNotifier {
   String get currentBook => _currentBook;
   set setCurrentBook(String value) {
     _currentBook = value;
+    debugPrint('Current book: $_currentBook');
     notifyListeners();
   }
 
@@ -12,6 +13,7 @@ class BibleNotifier extends ChangeNotifier {
   int get currentChapter => _currentChapter;
   set setCurrentChapter(int value) {
     _currentChapter = value;
+    debugPrint('Current chapter: $_currentChapter');
     notifyListeners();
   }
 

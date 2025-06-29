@@ -58,9 +58,16 @@ class _BiblePageState extends ConsumerState<BiblePage> {
     final localIp = ref.watch(ipAddressProvider);
 
     final scriptures = ref.watch(bibleProvider);
-    List<int> verses = List.generate(verseCount, (index) => index + 1);
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(middle: Text("Scriptures")),
+      navigationBar: CupertinoNavigationBar(
+        middle: Text("Scriptures"),
+        // trailing: CupertinoButton.filled(
+        //   child: Icon(CupertinoIcons.refresh),
+        //   onPressed: () async {
+        //     await bibleCall();
+        //   },
+        // ),
+      ),
       child: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -86,15 +93,11 @@ class _BiblePageState extends ConsumerState<BiblePage> {
                         physics: NeverScrollableScrollPhysics(),
                         children: [
                           /*  ------------------ Books ------------------- */
-                          booksPage(chapters),
+                          booksPage(),
                           /*  ------------------ Chapters ------------------- */
-                          chapterPage(scriptures, chapters),
+                          chapterPage(scriptures),
                           /*  ------------------ Verses ------------------- */
-                          versePage(
-                            scriptures,
-                            verses,
-                            localIp.connectionStatus,
-                          ),
+                          versePage(scriptures, localIp.connectionStatus),
                         ],
                       ),
             ),
@@ -104,7 +107,7 @@ class _BiblePageState extends ConsumerState<BiblePage> {
     );
   }
 
-  Widget booksPage(List<int> chapters) {
+  Widget booksPage() {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Column(
@@ -249,7 +252,8 @@ class _BiblePageState extends ConsumerState<BiblePage> {
     }
   }
 
-  Padding chapterPage(BibleNotifier scriptures, List<int> chapters) {
+  Padding chapterPage(BibleNotifier scriptures) {
+    chapters = bible.books[scriptures.currentBook]!.chapters.keys.toList();
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Column(
@@ -296,11 +300,11 @@ class _BiblePageState extends ConsumerState<BiblePage> {
     );
   }
 
-  Padding versePage(
-    BibleNotifier scriptures,
-    List<int> verses,
-    bool connectionStatus,
-  ) {
+  Padding versePage(BibleNotifier scriptures, bool connectionStatus) {
+    verseCount =
+        bible.books[scriptures.currentBook]!.chapters[scriptures
+            .currentChapter]!;
+    List<int> verses = List.generate(verseCount, (index) => index + 1);
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: Column(

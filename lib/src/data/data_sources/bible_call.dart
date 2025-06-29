@@ -1,8 +1,8 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 
-import '../../core/bible_data.dart';
 import '../models/bible_model.dart';
 
 Future<Bible> bibleCall() async {
@@ -14,14 +14,16 @@ Future<Bible> bibleCall() async {
   final String jsonString = await rootBundle.loadString(
     'assets/json/bibleData.json',
   );
-  Map<String, dynamic> jsonMap = json.decode(jsonString);//bibleData
+  Map<String, dynamic> jsonMap = json.decode(jsonString); //bibleData
   Bible bible = Bible.fromJson(jsonMap);
 
-  // print('1 John Abbreviation: ${bible.books["1 John"]?.abbreviation}');
-  // print('1 John Chapter 1 Verse Count: ${bible.books["1 John"]?.chapters[1]}');
+  debugPrint('1 John Abbreviation: ${bible.books["1 John"]?.abbreviation}');
+  debugPrint(
+    '1 John Chapter 1 Verse Count: ${bible.books["1 John"]?.chapters.length}',
+  );
   List<String> bookNames =
       bible.books.values.map((entry) => entry.abbreviation).toList();
-  // debugPrint(bookNames.toString());
+  debugPrint(bookNames.toString());
   List<int> chapterCounts = bible.books["1 John"]?.chapters.keys.toList() ?? [];
   // debugPrint("1 John is  ${chapterCounts.toString()}");
   int verseCount = bible.books["1 John"]?.chapters[1] ?? 0;
